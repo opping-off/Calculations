@@ -6,6 +6,32 @@
     <title>Horizon Recipes</title>
     <style>
         /* Global Styles */
+
+                .authors {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .author {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        .author img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid #70d6ff;
+            object-fit: cover;
+            margin-bottom: 6px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -453,6 +479,17 @@
     <header>
         <h1>Horizon: Life RP recipes</h1>
         <p>Select a recipe to view its ingredients</p>
+        <div class="authors">
+            <div class="author">
+                <img src="images/you.png" alt="Your profile picture">
+                <span>@aur.bee</span>
+            </div>
+            <div class="author">
+                <img src="images/friend.png" alt="Friend's profile picture">
+                <span>@tinnpots</span>
+            </div>
+        </div>
+        
     </header>
 
     <div class="container">
@@ -586,7 +623,8 @@
                     { name: "ammonium_chloride", quantity: 3 },
                     { name: "formaldehyde", quantity: 6 },
                     { name: "empty_barrel", quantity: 1, reusable: true }
-                ]
+                ],
+                description: "3 Ammonium Chloride + 6 Formaldehyde + 1 Empty Barrel"
             }
         };
 
@@ -1208,6 +1246,12 @@
             }
 
             const unitPrice = sellingPrices[currentRecipe.key][containerType];
+
+            // Special handling for LSD batches
+            if (currentRecipe.key === 'lsd' && containerType === 'packet') {
+                return unitPrice * containerCount; // Each packet sells for the packet price
+            }
+
             return unitPrice * containerCount;
         }
 
@@ -1236,16 +1280,52 @@
             let totalIngredientsCost = 0;
 
             currentRecipe.ingredients.forEach(ingredient => {
-                const ingredientPrice = ingredientPrices[ingredient.name] || 0;
-                const totalForIngredient = ingredientPrice * ingredient.quantity * requiredTrays;
-                totalIngredientsCost += totalForIngredient;
+                if (ingredient.crafted) {
+                    // For crafted items like methylamine barrel
+                    const craftedItem = craftedItems[ingredient.name];
+                    if (craftedItem) {
+                        const neededQuantity = ingredient.quantity * requiredTrays;
+                        ingredientsCostHTML += `
+                            <div class="ingredient-cost-item">
+                                <span class="ingredient-cost-name">${formatIngredientName(ingredient.name)} x${neededQuantity}</span>
+                                <span class="ingredient-cost-value">(Crafted)</span>
+                            </div>
+                        `;
+                        
+                        // Show sub-ingredients
+                        craftedItem.ingredients.forEach(subIngredient => {
+                            const subIngredientPrice = ingredientPrices[subIngredient.name] || 0;
+                            const totalSubQuantity = subIngredient.quantity * neededQuantity;
+                            const totalSubCost = subIngredientPrice * totalSubQuantity;
+                            
+                            if (!subIngredient.reusable || !hasReusableItems) {
+                                totalIngredientsCost += totalSubCost;
+                            }
 
-                ingredientsCostHTML += `
-                    <div class="ingredient-cost-item">
-                        <span class="ingredient-cost-name">${formatIngredientName(ingredient.name)} x${ingredient.quantity * requiredTrays}</span>
-                        <span class="ingredient-cost-value">${totalForIngredient}</span>
-                    </div>
-                `;
+                            ingredientsCostHTML += `
+                                <div class="ingredient-cost-item" style="margin-left: 20px;">
+                                    <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)} x${totalSubQuantity}</span>
+                                    <span class="ingredient-cost-value">${totalSubCost}</span>
+                                </div>
+                            `;
+                        });
+                    }
+                } else {
+                    // For regular ingredients
+                    const ingredientPrice = ingredientPrices[ingredient.name] || 0;
+                    const totalForIngredient = ingredientPrice * ingredient.quantity * requiredTrays;
+                    
+                    if (!ingredient.reusable || !hasReusableItems) {
+                        totalIngredientsCost += totalForIngredient;
+                    }
+
+                    ingredientsCostHTML += `
+                        <div class="ingredient-cost-item">
+                            <span class="ingredient-cost-name">${formatIngredientName(ingredient.name)} x${ingredient.quantity * requiredTrays}</span>
+                            <span class="ingredient-cost-value">${totalForIngredient}</span>
+                        </div>
+                    `;
+                }
             });
 
             // Update packaging cost breakdown
