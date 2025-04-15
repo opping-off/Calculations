@@ -6,8 +6,13 @@
     <title>Horizon Recipes</title>
     <style>
         /* Global Styles */
-
-                .authors {
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        .authors {
             display: flex;
             justify-content: center;
             gap: 40px;
@@ -32,12 +37,6 @@
             margin-bottom: 6px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
-        }
         .disclaimer {
             font-size: 0.8em;
             color: #888; 
@@ -479,17 +478,17 @@
     <header>
         <h1>Horizon: Life RP recipes</h1>
         <p>Select a recipe to view its ingredients</p>
+    
         <div class="authors">
             <div class="author">
-                <img src="images/you.png" alt="Your profile picture">
+                <img src="images/bee.png" alt="bee's profile picture">
                 <span>@aur.bee</span>
             </div>
             <div class="author">
-                <img src="images/friend.png" alt="Friend's profile picture">
+                <img src="images/tin.png" alt="Friend's profile picture">
                 <span>@tinnpots</span>
             </div>
         </div>
-        
     </header>
 
     <div class="container">
@@ -927,12 +926,10 @@
                 const ingredientCard = document.createElement('div');
                 ingredientCard.className = 'ingredient-card';
 
-                const imagePath = `/images/${ingredient.name}.png`;
-
+                // Create the base structure
                 ingredientCard.innerHTML = `
                     <div class="ingredient-image">
-                        <!-- Image placeholder -->
-                        <span>IMG</span>
+                        <span>Loading...</span>
                     </div>
                     <div class="ingredient-info">
                         <div class="ingredient-name">${formatIngredientName(ingredient.name)}</div>
@@ -940,10 +937,27 @@
                     </div>
                 `;
 
-                // Set the background image path for future use
-                ingredientCard.querySelector('.ingredient-image').style.backgroundImage = `url('${imagePath}')`;
-                ingredientCard.querySelector('.ingredient-image').style.backgroundSize = 'cover';
-                ingredientCard.querySelector('.ingredient-image').style.backgroundPosition = 'center';
+                // Normalize the ingredient name and create image path
+                const imageName = ingredient.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]/g, '');
+                const imagePath = `images/${imageName}.png`;
+
+                // Try to load the image
+                const image = new Image();
+                image.src = imagePath;
+
+                image.onload = () => {
+                    const imgElement = ingredientCard.querySelector('.ingredient-image');
+                    imgElement.style.backgroundImage = `url('${imagePath}')`;
+                    imgElement.style.backgroundSize = 'cover';
+                    imgElement.style.backgroundPosition = 'center';
+                    imgElement.querySelector('span').style.display = 'none';
+                };
+
+                image.onerror = () => {
+                    const imgElement = ingredientCard.querySelector('.ingredient-image');
+                    imgElement.style.backgroundColor = '#414455';
+                    imgElement.querySelector('span').textContent = formatIngredientName(ingredient.name).charAt(0);
+                };
 
                 ingredientsList.appendChild(ingredientCard);
             });
