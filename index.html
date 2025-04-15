@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon Recipes</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        .disclaimer {
+            font-size: 0.8em;
+            color: #888; 
+            display: block;
+            margin-top: 5px;
+        }
+        body {
+            background-color: #252836;
+            color: #e9e9e9;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border-bottom: 2px solid #414455;
+        }
+        h1 {
+            color: #ffb347;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        /* Main Container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        /* Recipe Selection */
+        .recipe-selection {
+            background-color: #313442;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .recipe-selection h2 {
+            margin-bottom: 15px;
+            color: #ffb347;
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e1f2a;
+            color: #e9e9e9;
+            border: 1px solid #414455;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        /* Recipe Display */
+        .recipe-display {
+            background-color: #313442;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: none; /* Hidden by default */
+        }
+        .recipe-display h2 {
+            margin-bottom: 15px;
+            color: #ffb347;
+        }
+        .recipe-title {
+            font-size: 1.8rem;
+            color: #70d6ff;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #414455;
+            padding-bottom: 10px;
+        }
+        /* Ingredients Section */
+        .ingredients-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .ingredient-card {
+            background-color: #1e1f2a;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+        .ingredient-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .ingredient-image {
+            width: 50px;
+            height: 50px;
+            background-color: #414455;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #70d6ff;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        .ingredient-info {
+            flex: 1;
+        }
+        .ingredient-name {
+            font-weight: bold;
+            color: #e9e9e9;
+            margin-bottom: 5px;
+        }
+        .ingredient-quantity {
+            font-size: 0.9rem;
+            color: #999;
+        }
+        /* Production Information */
+        .production-info {
+            background-color: #1e1f2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .production-info p {
+            margin-bottom: 8px;
+        }
+        .production-info strong {
+            color: #ffb347;
+        }
+        .production-info span {
+            color: #70d6ff;
+            font-weight: bold;
+        }
+        /* Recipe Grid Layout */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 20px;
+        }
+        .recipe-main, .recipe-stats {
+            background-color: #313442;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        /* Stats Panel */
+        .stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .stats-section {
+            background-color: #1e1f2a;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .stats-section h3 {
+            color: #ffb347;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            border-bottom: 1px solid #414455;
+            padding-bottom: 8px;
+        }
+        .stats-section h4 {
+            color: #70d6ff;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+        .divider {
+            height: 1px;
+            background-color: #414455;
+            margin: 10px 0;
+        }
+        /* Cost Breakdown */
+        .ingredient-cost-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .ingredient-cost-name {
+            color: #e9e9e9;
+        }
+        .ingredient-cost-value {
+            color: #70d6ff;
+        }
+        .empty-state {
+            color: #999;
+            font-style: italic;
+        }
+        /* Profit Analysis */
+        .profit {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: white; 
+        }
+        .profit-margin {
+            font-size: 0.9rem;
+        }
+        .reusable-items-toggle {
+          display: flex;
+          align-items: center;
+          gap: 10px; /* This adds clean space between the toggle and the label */
+        }
+
+        /* Quantity Selector */
+        .quantity-selector {
+            margin: 20px 0;
+        }
+        .quantity-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .quantity-control {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #414455;
+            background-color: #1e1f2a;
+            color: #e9e9e9;
+        }
+        input.quantity-control {
+            width: 80px;
+            text-align: center;
+        }
+        select.quantity-control {
+            flex: 1;
+        }
+        button.quantity-control {
+            background-color: #644cbc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 10px 20px;
+            transition: background-color 0.2s;
+        }
+        button.quantity-control:hover {
+            background-color: #7e62e3;
+        }
+        /* Recipe Editor */
+        .recipe-editor-section {
+            margin-bottom: 20px;
+        }
+        .recipe-editor {
+            background-color: #1e1f2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+        .recipe-editor.hidden {
+            display: none;
+        }
+        .editor-field {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-field label {
+            margin-bottom: 5px;
+            color: #70d6ff;
+        }
+        .editor-input {
+            padding: 8px;
+            background-color: #313442;
+            border: 1px solid #414455;
+            border-radius: 4px;
+            color: #e9e9e9;
+            font-size: 0.9rem;
+        }
+        .editor-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: flex-end;
+        }
+        .ingredient-editor-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: #313442;
+            border-radius: 4px;
+        }
+        .ingredient-editor-item select,
+        .ingredient-editor-item input {
+            padding: 6px;
+            background-color: #1e1f2a;
+            border: 1px solid #414455;
+            border-radius: 4px;
+            color: #e9e9e9;
+        }
+        .ingredient-editor-item input {
+            width: 60px;
+        }
+        .ingredient-editor-item select {
+            flex: 1;
+        }
+        .remove-ingredient-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .action-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .action-btn.primary {
+            background-color: #4caf50;
+            color: white;
+        }
+        .action-btn.secondary {
+            background-color: #607d8b;
+            color: white;
+        }
+        .action-btn.small {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+        }
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+        .sell-price-editor {
+            margin-top: 15px;
+            border-top: 1px solid #414455;
+            padding-top: 15px;
+        }
+        .price-editor-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .price-editor-item label {
+            width: 100px;
+        }
+        .price-editor-item input {
+            flex: 1;
+            max-width: 100px;
+            padding: 6px;
+            background-color: #313442;
+            border: 1px solid #414455;
+            border-radius: 4px;
+            color: #e9e9e9;
+        }
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .recipe-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .ingredients-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            .quantity-input-group {
+                flex-direction: column;
+            }
+            .editor-buttons {
+                flex-direction: column;
+            }
+            .ingredient-editor-item {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Reusable Items Toggle */
+        .reusable-items-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #4CAF50;
+        }
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        input:checked + .toggle-slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+        /* Rounded sliders */
+        .toggle-slider.round {
+            border-radius: 34px;
+        }
+        .toggle-slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Horizon: Life RP recipes</h1>
+        <p>Select a recipe to view its ingredients</p>
+    </header>
+
+    <div class="container">
+        <section class="recipe-selection">
+            <h2>Select Recipe</h2>
+            <select id="recipe-dropdown">
+                <option value="">-- Choose a Recipe --</option>
+                <!-- Options will be populated by JavaScript -->
+            </select>
+        </section>
+
+        <section class="recipe-display" id="recipe-display">
+            <div class="recipe-grid">
+                <!-- Left column: Recipe details and ingredients -->
+                <div class="recipe-main" id="recipe-content">
+                    <h2>Recipe Details</h2>
+                    <h3 class="recipe-title" id="recipe-title">Recipe Name</h3>
+
+                    <!-- Recipe Editor -->
+                    <div class="recipe-editor-section">
+                        <div id="recipe-editor" class="recipe-editor hidden">
+                            <h4>Recipe Properties</h4>
+                            <div class="editor-field">
+                                <label for="edit-recipe-name">Recipe Name:</label>
+                                <input type="text" id="edit-recipe-name" class="editor-input">
+                            </div>
+                            <div class="editor-field">
+                                <label for="edit-baggies-per-tray">Baggies Per Tray:</label>
+                                <input type="number" id="edit-baggies-per-tray" min="1" class="editor-input">
+                            </div>
+
+                            <h4>Ingredients</h4>
+                            <div id="edit-ingredients-list">
+                                <!-- This will be populated by JavaScript -->
+                            </div>
+
+                            <div class="editor-buttons">
+                                <button id="add-ingredient-btn" class="action-btn small">Add Ingredient</button>
+                                <button id="save-recipe-btn" class="action-btn primary">Save Recipe</button>
+                                <button id="cancel-edit-btn" class="action-btn secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ingredients-list" id="ingredients-list">
+                        <!-- Ingredients will be populated by JavaScript -->
+                    </div>
+
+                    <div class="container-section">
+                        <div class="reusable-items-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="reusableItemsToggle">
+                                <span class="toggle-slider round"></span>
+                            </label>
+                            <span class="toggle-label"> I have reusable items (barrels)</span>
+                        </div>
+                        <h3>Crafting Flow</h3>
+                        <div class="production-info" id="production-info">
+                            <p class="tray-info">All recipes start with <strong>Trays</strong> as the base production unit.</p>
+                            <p class="baggie-info">This recipe yields <span id="baggies-per-tray">1</span> unit per tray/batch.</p>
+                        </div>
+
+                        <div class="quantity-selector">
+                            <h4>Production Quantity</h4>
+                            <div class="quantity-input-group">
+                                <input type="number" id="quantity-input" min="1" value="1" class="quantity-control">
+                                <select id="quantity-type" class="quantity-control">
+                                    <option value="baggie">Baggies</option>
+                                    <option value="tray">Trays</option>
+                                    <!-- Other options will be populated dynamically based on the recipe -->
+                                </select>
+                                <button id="calculate-btn" class="quantity-control">Calculate</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right column: Cost and profit calculation -->
+                <div class="recipe-stats">
+                    <h2>Production Statistics</h2>
+                    <div class="stats-panel">
+                        <div class="stats-section production-summary">
+                            <h3>Production Summary</h3>
+                            <div id="production-summary">
+                                <p><span class="required-trays-label">Required Trays</span> <span id="required-trays">0</span></p>
+                                <p>Required Dryers (4 trays each): <span id="required-dryers">0</span></p>
+                                <p><span class="total-baggies-label">Total Baggies</span> <span id="total-baggies">0</span></p>
+                                <p>Final Product: <span id="final-product">0 Baggies</span></p>
+                            </div>
+                        </div>
+
+                        <div class="stats-section cost-breakdown">
+                            <h3>Cost Breakdown</h3>
+                            <div id="ingredients-cost">
+                                <!-- Will be populated by JS -->
+                                <p class="empty-state">Select a recipe and calculate quantities</p>
+                            </div>
+                            <div class="packaging-costs" id="packaging-costs">
+                                <h4>Packaging Materials</h4>
+                                <!-- Will be populated by JS -->
+                            </div>
+                            <div class="divider"></div>
+                            <div class="total-cost">
+                                <p>Total Cost: <span id="total-cost">0</span></p>
+                            </div>
+                        </div>
+
+                        <div class="stats-section profit-analysis">
+                            <h3>Profit Analysis</h3>
+                            <div id="profit-analysis">
+                                <p>Selling Price: <span id="selling-price">0</span></p>
+                                <p>Cost: <span id="cost-summary">0</span></p>
+                                <div class="divider"></div>
+                                <p class="profit">Profit: <span id="profit">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Recipe data and ingredient prices
+        // Ingredient price data
+        // Crafted items definitions
+        const craftedItems = {
+            "barrel_of_methylamine": {
+                ingredients: [
+                    { name: "ammonium_chloride", quantity: 3 },
+                    { name: "formaldehyde", quantity: 6 },
+                    { name: "empty_barrel", quantity: 1, reusable: true }
+                ]
+            }
+        };
+
+        // Reusable items tracking
+        const reusableItems = {
+            "empty_barrel": { price: 440 }
+        };
+
+        const ingredientPrices = {
+            // Raw ingredients
+            "sulfuric_acid": 130,
+            "lysergic_acid": 315,
+            "propane": 225,
+            "match_box": 345,
+            "benzophenone": 450,
+            "morphine": 65,
+            "painkillers": 157,
+            "acetone": 225,
+            "toluene": 50,
+            "potassium_permganate": 115,
+            "hydrogen_chloride": 440,
+            "nitrogen_trioxide": 130,
+            "kerosene": 700,
+            "aluminium_shavings": 160,
+            "ammonium_chloride": 450,
+            "formaldehyde": 430,
+            "phenalacetic_acid": 465,
+            "empty_barrel": 440, // costs 11 scrap
+
+
+
+
+            // Packaging materials
+            "cloth": 45,
+            "plastic": 225,
+            "saran_wrap": 112.5,
+            "paper": 135 // 3 cloth x 45 = 135
+
+
+
+        };
+
+        // Packaging requirements
+        const packagingRequirements = {
+            "baggie": { material: "saran_wrap", quantity: 1 },
+            "box": { material: "paper", quantity: 4 },
+            "brick": { material: "saran_wrap", quantity: 2 },
+            "pack": { material: "paper", quantity: 4 },
+            "bag": { material: "saran_wrap", quantity: 2 },
+            "container": { material: "plastic", quantity: 3 },
+
+        };
+
+        // Final product selling prices
+        const sellingPrices = {
+            "clear_meth": {
+                "baggie": 1250,
+                "container": 13310,
+
+            },
+            "lsd": {
+                "packet": 1950,
+                "bag": 20040, 
+                "batch": 1950 // it just works ok? Im not gonna question it
+            },
+            "heroin": {
+                "syringe": 2530,
+                "box": 25840,
+
+            },
+            "anadrol": {
+                "syringe": 1730,
+                "box": 17840
+            },
+            "pcp": {
+                "crystal": 1300,
+                "brick": 20040,
+            },
+            "cocaine": {
+                "baggie": 3060,
+                "brick": 46440,
+
+            },
+            "crack_cocaine": {
+                "crystal": 3920,
+                "brick": 59340
+            },
+            "blue_meth": {
+                "baggie": 2450,
+                "container": 25040
+            },
+            "ecstasy": {
+                "crystal": 3340,
+                "bag": 33940
+            },
+            "oxycodone": {
+                "crystal": 3480,
+                "bag": 35340
+            },
+            "fentanyl": {
+                "crystal": 3980,
+                "brick": 60240
+            },
+            "xylazine": {
+                "syringe": 5310,
+                "box": 53640
+            },
+
+        };
+
+        // Recipe data - structured for easy addition of new recipes
+        const recipeData = {
+            "clear_meth": {
+                name: "Clear Meth",
+                ingredients: [
+                    { name: "propane", quantity: 1 },
+                    { name: "sulfuric_acid", quantity: 1 },
+                    { name: "match_box", quantity: 2 },
+                    { name: "hydrogen_chloride", quantity: 1},
+                    { name: "acetone", quantity: 1}
+
+                ],
+                baggiesPerTray: 3,
+                finalForms: ["baggie", "container",]
+            },
+            "lsd": {
+                name: "LSD",
+                ingredients: [
+                    { name: "lysergic_acid", quantity: 2 },
+                    { name: "potassium_permganate", quantity: 2 },
+                    { name: "hydrogen_chloride", quantity: 2 },
+                    { name: "acetone", quantity: 1 },
+                    { name: "nitrogen_trioxide", quantity: 1 },
+                    { name: "paper", quantity: 1 },
+                    { name: "saran_wrap", quantity: 1 }
+                ],
+                usesTrays: false,
+                packetsPerBatch: 1, // Changed to 1 unit per batch
+                finalForms: ["packet", "bag"]
+            },
+            "blue_meth": {
+                name: "Blue Meth",
+                ingredients: [
+                    { name: "propane", quantity: 1 },
+                    { name: "aluminium_shavings", quantity: 1, container: "empty_barrel", reusable: true },
+                    { name: "hydrogen_chloride", quantity: 1 },
+                    { name: "acetone", quantity: 1 },
+                    { name: "barrel_of_methylamine", quantity: 1, crafted: true },
+                    { name: "phenalacetic_acid", quantity: 1 },
+                    { name: "kerosene", quantity: 1 },
+                    { name: "painkillers", quantity: 2, yields: { name: "ephedrine", quantity: 1 } }
+
+
+
+
+                ],
+                baggiesPerTray: 6,
+                finalForms: ["baggie", "container",]
+            },
+
+        };
+
+        // DOM Elements
+        const recipeDropdown = document.getElementById('recipe-dropdown');
+        const recipeDisplay = document.getElementById('recipe-display');
+        const recipeTitle = document.getElementById('recipe-title');
+        const ingredientsList = document.getElementById('ingredients-list');
+        const baggiesPerTrayElement = document.getElementById('baggies-per-tray');
+        const containerButtonsContainer = document.getElementById('container-buttons');
+
+        // Quantity selector elements
+        const quantityInput = document.getElementById('quantity-input');
+        const quantityType = document.getElementById('quantity-type');
+        const calculateBtn = document.getElementById('calculate-btn');
+
+        // Production summary elements
+        const requiredTraysElement = document.getElementById('required-trays');
+        const totalBaggiesElement = document.getElementById('total-baggies');
+        const finalProductElement = document.getElementById('final-product');
+        const requiredDryersElement = document.getElementById('required-dryers'); // Added element for dryers
+
+        // Cost and profit elements
+        const ingredientsCostElement = document.getElementById('ingredients-cost');
+        const packagingCostsElement = document.getElementById('packaging-costs');
+        const totalCostElement = document.getElementById('total-cost');
+        const sellingPriceElement = document.getElementById('selling-price');
+        const costSummaryElement = document.getElementById('cost-summary');
+        const profitElement = document.getElementById('profit');
+        const profitMarginElement = document.getElementById('profit-margin');
+
+        // Recipe editor elements
+        const toggleEditorBtn = document.getElementById('toggle-editor-btn');
+        const recipeEditor = document.getElementById('recipe-editor');
+        const editRecipeName = document.getElementById('edit-recipe-name');
+        const editBaggiesPerTray = document.getElementById('edit-baggies-per-tray');
+        const containerTypeCheckboxes = document.getElementById('container-type-checkboxes');
+        const editIngredientsList = document.getElementById('edit-ingredients-list');
+        const addIngredientBtn = document.getElementById('add-ingredient-btn');
+        const saveRecipeBtn = document.getElementById('save-recipe-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+        // Reusable items toggle
+        const reusableItemsToggle = document.getElementById('reusableItemsToggle');
+
+        // Current state tracking
+        let currentRecipe = null;
+        let currentContainerType = 'baggie';
+        let currentCalculation = {
+            requiredTrays: 0,
+            totalBaggies: 0,
+            containerCount: 0,
+            ingredientsCost: 0,
+            packagingCost: 0,
+            totalCost: 0,
+            sellingPrice: 0,
+            profit: 0,
+            profitMargin: 0
+        };
+
+        // Define available container types for the editor
+        const availableContainerTypes = [
+            { id: 'baggie', label: 'Baggie' },
+            { id: 'box', label: 'Box' },
+            { id: 'brick', label: 'Brick' },
+            { id: 'pack', label: 'Pack' },
+            { id: 'bag', label: 'Bag' },
+            { id: 'container', label: 'Container' },
+            { id: 'syringe', label: 'Syringe' },
+            { id: 'packet', label: 'Packet' }
+        ];
+
+        // Define conversion rates (how many baggies in each container type)
+        const containerConversionRates = {
+            'baggie': 1,
+            'box': 0,
+            'brick': 15,
+            'pack': 0,
+            'bag': 0,
+            'container': 10,
+            'packet': 1,
+        };
+
+        // Populate the dropdown with recipe options
+        function populateDropdown() {
+            for (const key in recipeData) {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = recipeData[key].name;
+                recipeDropdown.appendChild(option);
+            }
+        }
+
+        // Display the selected recipe
+        function displayRecipe(recipeKey) {
+            if (!recipeKey) {
+                if (recipeDisplay) {
+                    recipeDisplay.style.display = 'none';
+                }
+                currentRecipe = null;
+                return;
+            }
+
+            const recipe = recipeData[recipeKey];
+            if (!recipe) {
+                console.error('Recipe not found:', recipeKey);
+                return;
+            }
+
+            currentRecipe = {key: recipeKey, ...recipe};
+
+            if (recipeDisplay) {
+                recipeDisplay.style.display = 'block';
+            }
+
+            if (recipeTitle) {
+                recipeTitle.textContent = recipe.name;
+            }
+
+            // Update production info based on recipe type
+            const trayInfo = document.querySelector('.tray-info');
+            if (trayInfo) {
+                if (recipe.usesTrays === false) {
+                    trayInfo.innerHTML = `<p>This recipe uses batches instead of trays</p>`;
+                    if (baggiesPerTrayElement) {
+                        baggiesPerTrayElement.textContent = recipe.packetsPerBatch || 'N/A';
+                    }
+                } else {
+                    trayInfo.innerHTML = `<p>All recipes start with <strong>Trays</strong> as the base production unit.</p>`;
+                    if (baggiesPerTrayElement) {
+                        baggiesPerTrayElement.textContent = recipe.baggiesPerTray;
+                    }
+                }
+            }
+
+            // Clear existing ingredients
+            ingredientsList.innerHTML = '';
+
+            // Add each ingredient to the list
+            recipe.ingredients.forEach(ingredient => {
+                const ingredientCard = document.createElement('div');
+                ingredientCard.className = 'ingredient-card';
+
+                const imagePath = `/images/${ingredient.name}.png`;
+
+                ingredientCard.innerHTML = `
+                    <div class="ingredient-image">
+                        <!-- Image placeholder -->
+                        <span>IMG</span>
+                    </div>
+                    <div class="ingredient-info">
+                        <div class="ingredient-name">${formatIngredientName(ingredient.name)}</div>
+                        <div class="ingredient-quantity">Qty: ${ingredient.quantity}</div>
+                    </div>
+                `;
+
+                // Set the background image path for future use
+                ingredientCard.querySelector('.ingredient-image').style.backgroundImage = `url('${imagePath}')`;
+                ingredientCard.querySelector('.ingredient-image').style.backgroundSize = 'cover';
+                ingredientCard.querySelector('.ingredient-image').style.backgroundPosition = 'center';
+
+                ingredientsList.appendChild(ingredientCard);
+            });
+
+
+            // Update quantity type options based on recipe's finalForms
+            updateQuantityTypeOptions(recipe);
+
+            // Reset the calculation display
+            resetCalculationDisplay();
+
+            // Show the recipe display section
+            recipeDisplay.style.display = 'block';
+        }
+
+
+        // Update quantity type options based on recipe's finalForms
+        function updateQuantityTypeOptions(recipe) {
+            // Clear all existing options
+            quantityType.innerHTML = '';
+
+            if (recipe.usesTrays === false) {
+                // For packet-based recipes
+
+                                // Add packet option
+                if (!recipe.finalForms.includes('packet')) {
+                    const packetOption = document.createElement('option');
+                    packetOption.value = 'packet';
+                    packetOption.textContent = 'Packets';
+                    quantityType.appendChild(packetOption);
+                }
+
+            } else {
+                // For traditional tray-based recipes
+
+                // Add tray option
+                const trayOption = document.createElement('option');
+                trayOption.value = 'tray';
+                trayOption.textContent = 'Trays';
+                quantityType.appendChild(trayOption);
+
+                // Add baggie option
+                const baggieOption = document.createElement('option');
+                baggieOption.value = 'baggie';
+                baggieOption.textContent = 'Baggies';
+                quantityType.appendChild(baggieOption);
+            }
+
+            // Add other container options that are in the recipe's finalForms
+            const containerTypes = [
+                {value: 'syringe', label: 'Syringes'},
+                {value: 'packet', label: 'Packets'},
+                {value: 'box', label: 'Boxes'},
+                {value: 'brick', label: 'Bricks'},
+                {value: 'pack', label: 'Packs'},
+                {value: 'bag', label: 'Bags'},
+                {value: 'container', label: 'Containers'}
+            ];
+
+            containerTypes.forEach(container => {
+                if (recipe.finalForms.includes(container.value)) {
+                    const option = document.createElement('option');
+                    option.value = container.value;
+                    option.textContent = container.label;
+                    quantityType.appendChild(option);
+                }
+            });
+
+            // Select 'baggie' by default
+            quantityType.value = 'baggie';
+        }
+
+        // Reset calculation display
+        function resetCalculationDisplay() {
+            requiredTraysElement.textContent = '0';
+            totalBaggiesElement.textContent = '0';
+            finalProductElement.textContent = '0 Baggies';
+            requiredDryersElement.textContent = '0'; //Added for dryers
+            ingredientsCostElement.innerHTML = '<p class="empty-state">Select a recipe and calculate quantities</p>';
+            packagingCostsElement.innerHTML = '';
+            totalCostElement.textContent = '0';
+            sellingPriceElement.textContent = '0';
+            costSummaryElement.textContent = '0';
+            profitElement.textContent = '0';
+            profitMarginElement.textContent = '0%';
+        }
+
+        // Calculate production based on user input
+        function calculateProduction() {
+            if (!currentRecipe) {
+                alert('Please select a recipe first.');
+                return;
+            }
+
+            const quantity = parseInt(quantityInput.value) || 1;
+            const type = quantityType.value;
+
+
+            // Handle packet-based recipes differently from tray-based recipes
+            let totalBaggies = 0;
+            let requiredTrays = 0;
+            let requiredBatches = 0;
+
+            if (currentRecipe.usesTrays === false) {
+                // For packet-based recipes
+                switch(type) {
+                    case 'packet':
+                        // Calculate based on packets
+                        totalBaggies = quantity;
+                        requiredBatches = Math.ceil(quantity / currentRecipe.packetsPerBatch);
+                        break;
+                    case 'bag':
+                        // 10 packets per bag
+                        totalBaggies = quantity * 10;
+                        requiredBatches = Math.ceil(totalBaggies / currentRecipe.packetsPerBatch);
+                        break;
+                    default:
+                        totalBaggies = quantity;
+                        requiredBatches = Math.ceil(quantity / currentRecipe.packetsPerBatch);
+                }
+
+                // Set requiredTrays to requiredBatches for consistency in the UI
+                requiredTrays = requiredBatches;
+            } else {
+                // Traditional tray-based recipe calculation
+                switch(type) {
+                    case 'tray':
+                        totalBaggies = quantity *currentRecipe.baggiesPerTray;
+                        break;
+                    case 'baggie':
+                        totalBaggies = quantity;
+                        break;
+                    case 'box':
+                        totalBaggies = quantity * 10;
+                        break;
+                    case 'brick':
+                        totalBaggies = quantity * 15;
+                        break;
+                    case 'syringe':
+                        totalBaggies = quantity;
+                        break;
+                    case 'pack':
+                        totalBaggies = quantity * 8;
+                        break;
+                    case 'bag':
+                        totalBaggies = quantity * 10;
+                        break;
+                    case 'container':
+                        totalBaggies = quantity * 10;
+                        break;
+                }
+
+                // Calculate required trays (round up)
+                requiredTrays = Math.ceil(totalBaggies / currentRecipe.baggiesPerTray);
+            }
+
+            // Calculate final container count based on selected container type
+            let containerCount = 0;
+            let containerLabel = '';
+
+            switch(currentContainerType) {
+                case 'baggie':
+                    containerCount = totalBaggies;
+                    containerLabel = 'Baggies';
+                    break;
+                case 'packet':
+                    containerCount = totalBaggies;
+                    containerLabel = 'Packets';
+                    break;
+                case 'syringe':
+                    containerCount = totalBaggies;
+                    containerLabel = 'Syringes';
+                    break;
+                case 'box':
+                    containerCount = Math.floor(totalBaggies / 10);
+                    containerLabel = 'Boxes';
+                    break;
+                case 'brick':
+                    containerCount = Math.floor(totalBaggies / 15);
+                    containerLabel = 'Bricks';
+                    break;
+                case 'pack':
+                    containerCount = Math.floor(totalBaggies / 8);
+                    containerLabel = 'Packs';
+                    break;
+                case 'bag':
+                    containerCount = Math.floor(totalBaggies / 10);
+                    containerLabel = 'Bags';
+                    break;
+                case 'container':
+                    containerCount = Math.floor(totalBaggies / 10);
+                    containerLabel = 'Containers';
+                    break;
+            }
+
+            // Calculate ingredients cost
+            const ingredientsCost = calculateIngredientsCost(requiredTrays);
+
+            // Calculate packaging cost
+            const packagingCost = calculatePackagingCost(totalBaggies, currentContainerType, containerCount);
+
+            // Calculate total cost
+            const totalCost = ingredientsCost + packagingCost;
+
+            // Calculate selling price
+            const sellingPrice = calculateSellingPrice(containerCount, currentContainerType);
+
+            // Calculate profit and profit margin
+            const profit = sellingPrice - totalCost;
+            const profitMargin = sellingPrice > 0 ? (profit / sellingPrice * 100).toFixed(1) : 0;
+
+            // Save current calculation
+            currentCalculation = {
+                requiredTrays,
+                totalBaggies,
+                containerCount,
+                ingredientsCost,
+                packagingCost,
+                totalCost,
+                sellingPrice,
+                profit,
+                profitMargin
+            };
+
+            // Update UI
+            updateProductionSummary(requiredTrays, totalBaggies, containerCount, containerLabel);
+            updateCostBreakdown(requiredTrays, totalBaggies, currentContainerType, containerCount);
+            updateProfitAnalysis(totalCost, sellingPrice, profit, profitMargin);
+        }
+
+        // Calculate ingredients cost
+        // Add a toggle for reusable items
+        let hasReusableItems = false;
+
+        function calculateCraftedItemCost(itemName) {
+            const craftedItem = craftedItems[itemName];
+            if (!craftedItem) return 0;
+
+            let cost = 0;
+            craftedItem.ingredients.forEach(ingredient => {
+                if (ingredient.reusable && hasReusableItems) {
+                    return; // Skip cost if user has reusable items
+                }
+                const ingredientCost = ingredientPrices[ingredient.name] || 0;
+                cost += ingredientCost * ingredient.quantity;
+            });
+            return cost;
+        }
+
+        function calculateIngredientsCost(requiredTrays) {
+            let cost = 0;
+            let reusableItemsCost = 0;
+
+            currentRecipe.ingredients.forEach(ingredient => {
+                if (ingredient.crafted) {
+                    // Handle crafted items
+                    cost += calculateCraftedItemCost(ingredient.name) * ingredient.quantity * requiredTrays;
+                } else if (ingredient.reusable) {
+                    // Handle reusable items
+                    if (!hasReusableItems) {
+                        reusableItemsCost += ingredientPrices[ingredient.name] * ingredient.quantity;
+                    }
+                } else {
+                    // Handle regular ingredients
+                    const ingredientCost = ingredientPrices[ingredient.name] || 0;
+                    cost += ingredientCost * ingredient.quantity * requiredTrays;
+                }
+            });
+
+            return cost + reusableItemsCost;
+        }
+
+        // Calculate packaging cost
+        function calculatePackagingCost(totalBaggies, containerType, containerCount) {
+            let cost = 0;
+
+            // Calculate baggie materials cost (saran wrap)
+            const baggieRequirement = packagingRequirements['baggie'];
+            const baggieUnitCost = ingredientPrices[baggieRequirement.material] || 0;
+            const baggieMaterialCost = baggieUnitCost * baggieRequirement.quantity * totalBaggies;
+            cost += baggieMaterialCost;
+
+            // Calculate container materials cost if not just baggies
+            if (containerType !== 'baggie' && containerCount > 0) {
+                const containerRequirement = packagingRequirements[containerType];
+                if (containerRequirement) {
+                    const containerUnitCost = ingredientPrices[containerRequirement.material] || 0;
+                    const containerMaterialCost = containerUnitCost * containerRequirement.quantity * containerCount;
+                    cost += containerMaterialCost;
+                }
+            }
+
+            return cost;
+        }
+
+        // Calculate selling price
+        function calculateSellingPrice(containerCount, containerType) {
+            if (!sellingPrices[currentRecipe.key] || !sellingPrices[currentRecipe.key][containerType]) {
+                return 0; // No selling price defined
+            }
+
+            const unitPrice = sellingPrices[currentRecipe.key][containerType];
+            return unitPrice * containerCount;
+        }
+
+        // Update production summary in UI
+        function updateProductionSummary(requiredTrays, totalBaggies, containerCount, containerLabel) {
+            // Update labels based on recipe type
+            if (currentRecipe.usesTrays === false) {
+                document.querySelector('.required-trays-label').textContent = 'Required Batches:';
+                document.querySelector('.total-baggies-label').textContent = 'Total Packets:';
+            } else {
+                document.querySelector('.required-trays-label').textContent = 'Required Trays:';
+                document.querySelector('.total-baggies-label').textContent = 'Total Baggies:';
+            }
+
+            requiredTraysElement.textContent = requiredTrays;
+            totalBaggiesElement.textContent = totalBaggies;
+            finalProductElement.textContent = `${containerCount} ${containerLabel}`;
+            // Show dryers count except for LSD
+            requiredDryersElement.textContent = currentRecipe.usesTrays === false ? 'None' : Math.ceil(requiredTrays / 4);
+        }
+
+        // Update cost breakdown in UI
+        function updateCostBreakdown(requiredTrays, totalBaggies, containerType, containerCount) {
+            // Update ingredients cost breakdown
+            let ingredientsCostHTML = '<h4>Recipe Ingredients</h4>';
+            let totalIngredientsCost = 0;
+
+            currentRecipe.ingredients.forEach(ingredient => {
+                const ingredientPrice = ingredientPrices[ingredient.name] || 0;
+                const totalForIngredient = ingredientPrice * ingredient.quantity * requiredTrays;
+                totalIngredientsCost += totalForIngredient;
+
+                ingredientsCostHTML += `
+                    <div class="ingredient-cost-item">
+                        <span class="ingredient-cost-name">${formatIngredientName(ingredient.name)} x${ingredient.quantity * requiredTrays}</span>
+                        <span class="ingredient-cost-value">${totalForIngredient}</span>
+                    </div>
+                `;
+            });
+
+            // Update packaging cost breakdown
+            let packagingCostHTML = '<h4>Packaging Materials</h4>';
+            let totalPackagingCost = 0;
+
+            if (currentRecipe.usesTrays === false) {
+                // For packet-based recipes, use paper
+                const packetRequirement = { material: 'paper', quantity: 1 };
+                const packetUnitCost = ingredientPrices[packetRequirement.material] || 0;
+                const packetMaterialCost = packetUnitCost * packetRequirement.quantity * totalBaggies;
+                totalPackagingCost += packetMaterialCost;
+
+                packagingCostHTML += `
+                    <div class="ingredient-cost-item">
+                        <span class="ingredient-cost-name">Paper (for ${totalBaggies} packets)</span>
+                        <span class="ingredient-cost-value">${packetMaterialCost}</span>
+                    </div>
+                `;
+            } else {
+                // For traditional tray-based recipes, use saran wrap
+                const baggieRequirement = packagingRequirements['baggie'];
+                const baggieUnitCost = ingredientPrices[baggieRequirement.material] || 0;
+                const baggieMaterialCost = baggieUnitCost * baggieRequirement.quantity * totalBaggies;
+                totalPackagingCost += baggieMaterialCost;
+
+                packagingCostHTML += `
+                    <div class="ingredient-cost-item">
+                        <span class="ingredient-cost-name">Saran Wrap (for ${totalBaggies} baggies)</span>
+                        <span class="ingredient-cost-value">${baggieMaterialCost}</span>
+                    </div>
+                `;
+            }
+
+            // Add container materials if needed
+            if (containerType !== 'baggie' && containerCount > 0) {
+                const containerRequirement = packagingRequirements[containerType];
+                if (containerRequirement) {
+                    const containerUnitCost = ingredientPrices[containerRequirement.material] || 0;
+                    const containerMaterialCost = containerUnitCost * containerRequirement.quantity * containerCount;
+                    totalPackagingCost += containerMaterialCost;
+
+                    const materialName = formatIngredientName(containerRequirement.material);
+                    packagingCostHTML += `
+                        <div class="ingredient-cost-item">
+                            <span class="ingredient-cost-name">${materialName} (for ${containerCount} ${containerType}s)</span>
+                            <span class="ingredient-cost-value">${containerMaterialCost}</span>
+                        </div>
+                    `;
+                }
+            }
+
+            // Update DOM
+            ingredientsCostElement.innerHTML = ingredientsCostHTML;
+            packagingCostsElement.innerHTML = packagingCostHTML;
+            totalCostElement.textContent = (totalIngredientsCost + totalPackagingCost);
+        }
+
+        // Update profit analysis in UI
+        function updateProfitAnalysis(totalCost, sellingPrice, profit, profitMargin) {
+            sellingPriceElement.textContent = sellingPrice;
+            costSummaryElement.textContent = totalCost;
+            profitElement.textContent = profit;
+            profitMarginElement.textContent = `${profitMargin}%`;
+
+            // Change color based on profit (red if negative)
+            profitElement.style.color = profit >= 0 ? '#4caf50' : 'red';
+            profitElement.textContent = Math.abs(profit);
+        }
+
+        // Format ingredient name for display (convert snake_case to Title Case)
+        function formatIngredientName(name) {
+            return name.split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        // Open the recipe editor with the current recipe data
+        function openRecipeEditor() {
+            if (!currentRecipe) {
+                alert('Please select a recipe first.');
+                return;
+            }
+
+            // Populate the editor with current recipe data
+            editRecipeName.value = currentRecipe.name;
+
+            // Handle different recipe types
+            if (currentRecipe.usesTrays === false) {
+                // For packet-based recipes
+                document.querySelector('.baggies-per-tray-label').textContent = 'Packets per Batch:';
+                editBaggiesPerTray.value = currentRecipe.packetsPerBatch || 5;
+            } else {
+                // For traditional tray-based recipes
+                document.querySelector('.baggies-per-tray-label').textContent = 'Baggies per Tray:';
+                editBaggiesPerTray.value = currentRecipe.baggiesPerTray;
+            }
+
+            // Create container type checkboxes
+            populateContainerTypeCheckboxes();
+
+            // Populate ingredients list
+            populateIngredientEditor();
+
+            // Show the editor
+            recipeEditor.classList.remove('hidden');
+            toggleEditorBtn.textContent = 'Close Editor';
+        }
+
+        // Close the recipe editor without saving
+        function closeRecipeEditor() {
+            recipeEditor.classList.add('hidden');
+            toggleEditorBtn.textContent = 'Edit Recipe';
+        }
+
+        // Populate container type checkboxes in editor
+        function populateContainerTypeCheckboxes() {
+            containerTypeCheckboxes.innerHTML = '';
+
+            availableContainerTypes.forEach(containerType => {
+                if (containerType.id !== 'tray') { // Skip tray as it's not a final form
+                    const isChecked = currentRecipe.finalForms.includes(containerType.id);
+
+                    const checkboxItem = document.createElement('div');
+                    checkboxItem.className = 'checkbox-item';
+                    checkboxItem.innerHTML = `
+                        <input type="checkbox" id="container-${containerType.id}" 
+                            data-container="${containerType.id}" ${isChecked ? 'checked' : ''}>
+                        <label for="container-${containerType.id}">${containerType.label}</label>
+                    `;
+
+                    containerTypeCheckboxes.appendChild(checkboxItem);
+                }
+            });
+        }
+
+        // Populate ingredient editor list
+        function populateIngredientEditor() {
+            editIngredientsList.innerHTML = '';
+
+            currentRecipe.ingredients.forEach((ingredient, index) => {
+                addIngredientToEditor(ingredient.name, ingredient.quantity);
+            });
+        }
+
+        // Add a new ingredient to the editor
+        function addIngredientToEditor(ingredientName = '', quantity = 1) {
+            const ingredientItem = document.createElement('div');
+            ingredientItem.className = 'ingredient-editor-item';
+
+            // Create ingredient dropdown 
+            const ingredientSelect = document.createElement('select');
+            ingredientSelect.className = 'ingredient-select';
+
+            // Add option for each available ingredient
+            Object.keys(ingredientPrices)
+                .filter(name => !['cloth', 'plastic', 'paper', 'saran_wrap'].includes(name)) // Filter out packaging materials
+                .sort()
+                .forEach(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = formatIngredientName(name);
+
+                    if (name === ingredientName) {
+                        option.selected = true;
+                    }
+
+                    ingredientSelect.appendChild(option);
+                });
+
+            // Create quantity input
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'number';
+            quantityInput.className = 'ingredient-quantity';
+            quantityInput.min = 1;
+            quantityInput.value = quantity;
+
+            // Create remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-ingredient-btn';
+            removeBtn.textContent = 'x';
+            removeBtn.addEventListener('click', function() {
+                ingredientItem.remove();
+            });
+
+            // Assemble the ingredient item
+            ingredientItem.appendChild(ingredientSelect);
+            ingredientItem.appendChild(quantityInput);
+            ingredientItem.appendChild(removeBtn);
+
+            // Add to the ingredients list
+            editIngredientsList.appendChild(ingredientItem);
+        }
+
+        // Save the current recipe with the editor data
+        function saveRecipe() {
+            // Get recipe name
+            const name = editRecipeName.value.trim();
+            if (!name) {
+                alert('Please enter a recipe name.');
+                return;
+            }
+
+            // Get the numeric value from the editor field (could be baggiesPerTray or packetsPerBatch)
+            const conversionRateValue = parseInt(editBaggiesPerTray.value) || 1;
+
+            // Get selected container types
+            const selectedContainers = [];
+            const containerCheckboxes = containerTypeCheckboxes.querySelectorAll('input[type="checkbox"]');
+
+            containerCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedContainers.push(checkbox.getAttribute('data-container'));
+                }
+            });
+
+            if (selectedContainers.length === 0) {
+                alert('Please select at least one container type.');
+                return;
+            }
+
+            // Get ingredients
+            const ingredients = [];
+            const ingredientItems = editIngredientsList.querySelectorAll('.ingredient-editor-item');
+
+            ingredientItems.forEach(item => {
+                const select = item.querySelector('.ingredient-select');
+                const quantityInput = item.querySelector('.ingredient-quantity');
+
+                if (select && quantityInput) {
+                    const name = select.value;
+                    const quantity = parseInt(quantityInput.value) || 1;
+
+                    ingredients.push({ name, quantity });
+                }
+            });
+
+            if (ingredients.length === 0) {
+                alert('Please add at least one ingredient.');
+                return;
+            }
+
+            // Create the base recipe object
+            const recipeBase = {
+                name,
+                ingredients,
+                finalForms: selectedContainers
+            };
+
+            // Add the appropriate properties based on recipe type
+            if (currentRecipe.usesTrays === false) {
+                // For packet-based recipes
+                recipeBase.usesTrays = false;
+                recipeBase.packetsPerBatch = conversionRateValue;
+            } else {
+                // For traditional tray-based recipes
+                recipeBase.baggiesPerTray = conversionRateValue;
+            }
+
+            // Update the recipe in recipeData
+            recipeData[currentRecipe.key] = recipeBase;
+
+            // Update the current recipe variable
+            currentRecipe = {
+                key: currentRecipe.key,
+                ...recipeBase
+            };
+
+            // Update the displayed recipe
+            recipeTitle.textContent = name;
+
+            // Update the display of the recipe
+            displayRecipe(currentRecipe.key);
+
+            // Close the editor
+            closeRecipeEditor();
+        }
+
+        // Event Listeners
+        recipeDropdown.addEventListener('change', function() {
+            displayRecipe(this.value);
+        });
+
+
+        // Calculate button click handler
+        calculateBtn.addEventListener('click', calculateProduction);
+
+        // Quantity input event handlers for validation
+        quantityInput.addEventListener('input', function() {
+            // Ensure minimum value is 1
+            if (this.value < 1) {
+                this.value = 1;
+            }
+        });
+
+        //Reusable Items Toggle
+        reusableItemsToggle.addEventListener('change', function() {
+            hasReusableItems = this.checked;
+            calculateProduction(); // Recalculate cost when toggle changes
+        });
+
+
+        // Editor functionality will be handled through the main UI interactions
+        // These buttons have been removed from the HTML structure
+        function handleEditorControls() {
+            const addIngredientButton = document.getElementById('add-ingredient-btn');
+            const saveRecipeButton = document.getElementById('save-recipe-btn');
+            const cancelEditButton = document.getElementById('cancel-edit-btn');
+
+            if (addIngredientButton) {
+                addIngredientButton.addEventListener('click', addIngredientToEditor);
+            }
+
+            if (saveRecipeButton) {
+                saveRecipeButton.addEventListener('click', saveRecipe);
+            }
+
+            if (cancelEditButton) {
+                cancelEditButton.addEventListener('click', closeRecipeEditor);
+            }
+        }
+
+        // Initialize the application
+        function init() {
+            populateDropdown();
+            handleEditorControls();
+        }
+
+        // Start the application when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
