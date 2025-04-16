@@ -48,6 +48,36 @@
             display: block;
             margin-top: 2px;
         }
+        .author-ign {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ign-label {
+            font-weight: bold;
+            color: #00b3b3;  /* Light turquoise color */
+            margin-right: 5px;
+        }
+
+        .ign-value {
+            color: #ccc;
+            font-style: italic;
+        }
+        .credits {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .credits h2 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00b3b3;  /* Light turquoise color */
+            border-bottom: 2px solid #00b3b3;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
 
         .disclaimer {
             font-size: 0.8em;
@@ -492,34 +522,59 @@
         <p>Select a recipe to view its ingredients</p>
         <small> Not officially affiliated with Horizon</small>
     
+        <div class="credits">
+            <h2>Contributors</h2>
+        </div>
+    
         <div class="authors">
             <div class="author">
-                <img src="images/bee.png" alt="bee's profile picture">
+                <img src="images/bee.png" alt="Profile picture of @aur.bee">
                 <span>@aur.bee</span>
                 <small>Programmer</small>
+                <div class="author-ign">
+                    <span class="ign-label">IGN:</span>
+                    <span class="ign-value">"pop"</span>
+                </div>
             </div>
             <div class="author">
-                <img src="images/tin.png" alt="tin's profile picture">
+                <img src="images/tin.png" alt="Profile picture of @tinnpots">
                 <span>@tinnpots</span>
                 <small>Visuals</small>
+                <div class="author-ign">
+                    <span class="ign-label">IGN:</span>
+                    <span class="ign-value">"tin"</span>
+                </div>
             </div>
             <div class="author">
-                <img src="images/pending.png" alt="leo's profile picture">
+                <img src="images/pending.png" alt="Pending profile picture">
                 <span>@pending</span>
                 <small>Beta Tester</small>
+                <div class="author-ign">
+                    <span class="ign-label">IGN:</span>
+                    <span class="ign-value">"pending"</span>
+                </div>
             </div>
             <div class="author">
-                <img src="images/pending.png" alt="nova's profile picture">
+                <img src="images/pending.png" alt="Pending profile picture">
                 <span>@pending</span>
                 <small>Beta Tester</small>
+                <div class="author-ign">
+                    <span class="ign-label">IGN:</span>
+                    <span class="ign-value">"pending"</span>
+                </div>
             </div>
             <div class="author">
-                <img src="images/pending.png" alt="kai's profile picture">
+                <img src="images/pending.png" alt="Pending profile picture">
                 <span>@pending</span>
                 <small>Beta Tester</small>
+                <div class="author-ign">
+                    <span class="ign-label">IGN:</span>
+                    <span class="ign-value">"pending"</span>
+                </div>
             </div>
         </div>
     </header>
+    
     
 
     <div class="container">
