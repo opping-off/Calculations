@@ -514,6 +514,36 @@
         .toggle-slider.round:before {
             border-radius: 50%;
         }
+
+        /* Advertisement Panels */
+        .ad-container {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .ad-panel {
+            flex: 1;
+            background-color: #1e1f2a;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            color: #999;
+            border: 1px solid #414455;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .ad-panel:hover {
+            border-color: #70d6ff;
+            box-shadow: 0 4px 12px rgba(112, 214, 255, 0.1);
+        }
+
+
     </style>
 </head>
 <body>
@@ -521,11 +551,11 @@
         <h1>Horizon: Life RP recipes</h1>
         <p>Select a recipe to view its ingredients</p>
         <small> Not officially affiliated with Horizon</small>
-    
+
         <div class="credits">
             <h2>Contributors</h2>
         </div>
-    
+
         <div class="authors">
             <div class="author">
                 <img src="images/bee.png" alt="Profile picture of @aur.bee">
@@ -574,8 +604,8 @@
             </div>
         </div>
     </header>
-    
-    
+
+
 
     <div class="container">
         <section class="recipe-selection">
@@ -585,6 +615,13 @@
                 <!-- Options will be populated by JavaScript -->
             </select>
         </section>
+
+        <!-- Advertisement Panels -->
+        <div class="ad-container">
+            <div class="ad-panel">Coming soon...</div>
+            <div class="ad-panel">Coming soon...</div>
+            <div class="ad-panel">Coming soon...</div>
+        </div>
 
         <section class="recipe-display" id="recipe-display">
             <div class="recipe-grid">
@@ -624,12 +661,12 @@
                     </div>
 
                     <div class="container-section">
-                        <div class="reusable-items-toggle">
+                        <div class="reusable-items-toggle" id="reusableItemsToggleContainer" style="display: none;">
                             <label class="toggle-switch">
                                 <input type="checkbox" id="reusableItemsToggle">
                                 <span class="toggle-slider round"></span>
                             </label>
-                            <span class="toggle-label"> I have reusable items (barrels)</span>
+                            <span class="toggle-label"> I have reusable items</span>
                         </div>
                         <h3>Crafting Flow</h3>
                         <div class="production-info" id="production-info">
@@ -690,12 +727,18 @@
                                 <p>Cost: <span id="cost-summary">0</span></p>
                                 <div class="divider"></div>
                                 <p class="profit">Profit: <span id="profit">0</span></p>
+                                <p class="profit-margin">Profit Margin: <span id="profit-margin">0%</span></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- Bottom Advertisement Panel -->
+    <div class="ad-container" style="margin-top: 40px;">
+        <div class="ad-panel" style="width: 100%;">Coming soon...</div>
     </div>
 
     <script>
@@ -710,6 +753,14 @@
                     { name: "empty_barrel", quantity: 1, reusable: true }
                 ],
                 description: "3 Ammonium Chloride + 6 Formaldehyde + 1 Empty Barrel"
+            },
+            "tartrate_salt": {
+                ingredients: [
+                    { name: "potassium_permanganate", quantity: 2 },
+                    { name: "hydrogen_chloride", quantity: 2 }
+                ],
+                description: "2 Potassium Permanganate + 2 Hydrogen Chloride",
+                yields: 4 // Each crafting action creates 4 tartrate salts
             }
         };
 
@@ -729,15 +780,18 @@
             "painkillers": 157,
             "acetone": 225,
             "toluene": 50,
-            "potassium_permganate": 115,
+            "potassium_permanganate": 115,
             "hydrogen_chloride": 440,
             "nitrogen_trioxide": 130,
             "kerosene": 700,
-            "aluminium_shavings": 165,
+            "aluminium_shavings": 160,
             "ammonium_chloride": 450,
             "formaldehyde": 430,
             "phenalacetic_acid": 465,
             "empty_barrel": 440, // costs 11 scrap
+            "cocaine_hydrochloride": 0,
+            "coca_leaves": 0,
+
 
 
 
@@ -760,7 +814,7 @@
             "pack": { material: "paper", quantity: 4 },
             "bag": { material: "saran_wrap", quantity: 2 },
             "container": { material: "plastic", quantity: 3 },
-
+            "packet": { material: "paper", quantity: 1 }
         };
 
         // Final product selling prices
@@ -839,11 +893,9 @@
                 name: "LSD",
                 ingredients: [
                     { name: "lysergic_acid", quantity: 2 },
-                    { name: "potassium_permganate", quantity: 2 },
-                    { name: "hydrogen_chloride", quantity: 2 },
+                    { name: "tartrate_salt", quantity: 1, crafted: true },
                     { name: "acetone", quantity: 1 },
                     { name: "nitrogen_trioxide", quantity: 1 },
-                    { name: "paper", quantity: 1 },
                     { name: "saran_wrap", quantity: 1 }
                 ],
                 usesTrays: false,
@@ -867,6 +919,26 @@
 
                 ],
                 baggiesPerTray: 6,
+                finalForms: ["baggie", "container",]
+            },
+            "cocaine": {
+                name: "Cocaine",
+                ingredients: [
+                    { name: "cocaine_hydrochloride", quantity: 1 },
+                    { name: "kerosene", quantity: 1 },
+                    { name: "sulfuric_acid", quantity: 1 },
+                    { name: "potassium_permanganate", quantity: 1 },
+                    { name: "nitrogen_trioxide", quantity: 1 },
+                    { name: "propane", quantity: 1 },
+                    { name: "coca_leaves", quantity: 3 },
+
+
+
+
+
+                ],
+                usesTrays: true,
+                baggiesPerTray: 3,
                 finalForms: ["baggie", "container",]
             },
 
@@ -929,6 +1001,8 @@
             profitMargin: 0
         };
 
+
+
         // Define available container types for the editor
         const availableContainerTypes = [
             { id: 'baggie', label: 'Baggie' },
@@ -980,12 +1054,36 @@
 
             currentRecipe = {key: recipeKey, ...recipe};
 
+            // Set default container type based on recipe
+            if (recipeKey === 'lsd') {
+                currentContainerType = 'packet';
+            } else {
+                currentContainerType = 'baggie';
+            }
+
             if (recipeDisplay) {
                 recipeDisplay.style.display = 'block';
             }
 
             if (recipeTitle) {
                 recipeTitle.textContent = recipe.name;
+            }
+
+            // Check for reusable items in the recipe and show/hide the toggle
+            const reusableItemsToggleContainer = document.getElementById('reusableItemsToggleContainer');
+            const hasReusableIngredients = recipe.ingredients.some(ingredient => ingredient.reusable === true);
+
+            if (reusableItemsToggleContainer) {
+                if (hasReusableIngredients) {
+                    reusableItemsToggleContainer.style.display = 'flex';
+                } else {
+                    reusableItemsToggleContainer.style.display = 'none';
+                    // Reset the toggle if no reusable items
+                    if (reusableItemsToggle) {
+                        reusableItemsToggle.checked = false;
+                        hasReusableItems = false;
+                    }
+                }
             }
 
             // Update production info based on recipe type
@@ -1112,8 +1210,12 @@
                 }
             });
 
-            // Select 'baggie' by default
-            quantityType.value = 'baggie';
+            // Select the appropriate default based on recipe type
+            if (currentRecipe.key === 'lsd') {
+                quantityType.value = 'packet';
+            } else {
+                quantityType.value = 'baggie';
+            }
         }
 
         // Reset calculation display
@@ -1278,17 +1380,28 @@
         // Add a toggle for reusable items
         let hasReusableItems = false;
 
-        function calculateCraftedItemCost(itemName) {
+        function calculateCraftedItemCost(itemName, neededQuantity = 1) {
             const craftedItem = craftedItems[itemName];
             if (!craftedItem) return 0;
 
+            // If the item has a yield value, adjust the needed quantity
+            // This is the key change for tartrate salt which yields 4 per craft
+            const yieldPerCraft = craftedItem.yields || 1;
+            
+            // Calculate how many crafting operations we need to do
+            // For example, if we need 3 tartrate salt, but each craft yields 4,
+            // we only need to craft it once (Math.ceil(3/4) = 1)
+            const craftingOperations = Math.ceil(neededQuantity / yieldPerCraft);
+            
             let cost = 0;
             craftedItem.ingredients.forEach(ingredient => {
                 if (ingredient.reusable && hasReusableItems) {
                     return; // Skip cost if user has reusable items
                 }
                 const ingredientCost = ingredientPrices[ingredient.name] || 0;
-                cost += ingredientCost * ingredient.quantity;
+                
+                // We multiple by the number of crafting operations, not the needed quantity
+                cost += ingredientCost * ingredient.quantity * craftingOperations;
             });
             return cost;
         }
@@ -1300,7 +1413,9 @@
             currentRecipe.ingredients.forEach(ingredient => {
                 if (ingredient.crafted) {
                     // Handle crafted items
-                    cost += calculateCraftedItemCost(ingredient.name) * ingredient.quantity * requiredTrays;
+                    // Pass the total needed quantity to calculate proper crafting operations
+                    const totalNeeded = ingredient.quantity * requiredTrays;
+                    cost += calculateCraftedItemCost(ingredient.name, totalNeeded);
                 } else if (ingredient.reusable) {
                     // Handle reusable items
                     if (!hasReusableItems) {
@@ -1320,14 +1435,23 @@
         function calculatePackagingCost(totalBaggies, containerType, containerCount) {
             let cost = 0;
 
-            // Calculate baggie materials cost (saran wrap)
-            const baggieRequirement = packagingRequirements['baggie'];
-            const baggieUnitCost = ingredientPrices[baggieRequirement.material] || 0;
-            const baggieMaterialCost = baggieUnitCost * baggieRequirement.quantity * totalBaggies;
-            cost += baggieMaterialCost;
+            // Handle different packaging based on recipe type
+            if (currentRecipe.usesTrays === false) {
+                // For packet-based recipes like LSD, use paper for packets
+                const packetRequirement = packagingRequirements['packet'] || { material: 'paper', quantity: 1 };
+                const packetUnitCost = ingredientPrices[packetRequirement.material] || 0;
+                const packetMaterialCost = packetUnitCost * packetRequirement.quantity * totalBaggies;
+                cost += packetMaterialCost;
+            } else {
+                // For traditional tray-based recipes, use saran wrap for baggies
+                const baggieRequirement = packagingRequirements['baggie'];
+                const baggieUnitCost = ingredientPrices[baggieRequirement.material] || 0;
+                const baggieMaterialCost = baggieUnitCost * baggieRequirement.quantity * totalBaggies;
+                cost += baggieMaterialCost;
+            }
 
-            // Calculate container materials cost if not just baggies
-            if (containerType !== 'baggie' && containerCount > 0) {
+            // Calculate container materials cost if not just baggies/packets
+            if ((containerType !== 'baggie' && containerType !== 'packet') && containerCount > 0) {
                 const containerRequirement = packagingRequirements[containerType];
                 if (containerRequirement) {
                     const containerUnitCost = ingredientPrices[containerRequirement.material] || 0;
@@ -1391,21 +1515,33 @@
                                 <span class="ingredient-cost-value">(Crafted)</span>
                             </div>
                         `;
-                        
+
                         // Show sub-ingredients
+                        // Account for the yield of crafted items
+                        const yieldPerCraft = craftedItem.yields || 1;
+                        const craftingOperations = Math.ceil(neededQuantity / yieldPerCraft);
+                        
                         craftedItem.ingredients.forEach(subIngredient => {
                             const subIngredientPrice = ingredientPrices[subIngredient.name] || 0;
-                            const totalSubQuantity = subIngredient.quantity * neededQuantity;
+                            // Calculate quantity based on crafting operations, not total needed
+                            const totalSubQuantity = subIngredient.quantity * craftingOperations;
                             const totalSubCost = subIngredientPrice * totalSubQuantity;
-                            
+
                             if (!subIngredient.reusable || !hasReusableItems) {
                                 totalIngredientsCost += totalSubCost;
                             }
 
+                            // Add indicator for reusable items
+                            const reusableLabel = subIngredient.reusable ? ' (Reusable)' : '';
+                            const costDisplay = subIngredient.reusable && hasReusableItems ? 'Already Have' : totalSubCost;
+                            
+                            // Add yield info if applicable
+                            const yieldInfo = craftedItem.yields > 1 ? ` (Yields ${craftedItem.yields} per craft)` : '';
+
                             ingredientsCostHTML += `
                                 <div class="ingredient-cost-item" style="margin-left: 20px;">
-                                    <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)} x${totalSubQuantity}</span>
-                                    <span class="ingredient-cost-value">${totalSubCost}</span>
+                                    <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)}${reusableLabel} x${totalSubQuantity}${yieldInfo}</span>
+                                    <span class="ingredient-cost-value">${costDisplay}</span>
                                 </div>
                             `;
                         });
@@ -1414,15 +1550,19 @@
                     // For regular ingredients
                     const ingredientPrice = ingredientPrices[ingredient.name] || 0;
                     const totalForIngredient = ingredientPrice * ingredient.quantity * requiredTrays;
-                    
+
                     if (!ingredient.reusable || !hasReusableItems) {
                         totalIngredientsCost += totalForIngredient;
                     }
 
+                    // Add indicator for reusable items
+                    const reusableLabel = ingredient.reusable ? ' (Reusable)' : '';
+                    const costDisplay = ingredient.reusable && hasReusableItems ? 'Already Have' : totalForIngredient;
+
                     ingredientsCostHTML += `
                         <div class="ingredient-cost-item">
-                            <span class="ingredient-cost-name">${formatIngredientName(ingredient.name)} x${ingredient.quantity * requiredTrays}</span>
-                            <span class="ingredient-cost-value">${totalForIngredient}</span>
+                            <span class="ingredient-cost-name">${formatIngredientName(ingredient.name)}${reusableLabel} x${ingredient.quantity * requiredTrays}</span>
+                            <span class="ingredient-cost-value">${costDisplay}</span>
                         </div>
                     `;
                 }
@@ -1434,7 +1574,7 @@
 
             if (currentRecipe.usesTrays === false) {
                 // For packet-based recipes, use paper
-                const packetRequirement = { material: 'paper', quantity: 1 };
+                const packetRequirement = packagingRequirements['packet'];
                 const packetUnitCost = ingredientPrices[packetRequirement.material] || 0;
                 const packetMaterialCost = packetUnitCost * packetRequirement.quantity * totalBaggies;
                 totalPackagingCost += packetMaterialCost;
@@ -1492,8 +1632,12 @@
             profitMarginElement.textContent = `${profitMargin}%`;
 
             // Change color based on profit (red if negative)
-            profitElement.style.color = profit >= 0 ? '#4caf50' : 'red';
+            const profitColor = profit >= 0 ? '#4caf50' : 'red';
+            profitElement.style.color = profitColor;
             profitElement.textContent = Math.abs(profit);
+
+            // Also change color of profit margin
+            profitMarginElement.style.color = profitColor;
         }
 
         // Format ingredient name for display (convert snake_case to Title Case)
@@ -1718,6 +1862,16 @@
             // Ensure minimum value is 1
             if (this.value < 1) {
                 this.value = 1;
+            }
+        });
+
+        // Quantity type change event
+        quantityType.addEventListener('change', function() {
+            // Update the current container type to match the selected quantity type
+            currentContainerType = this.value;
+            // Recalculate if a recipe is selected
+            if (currentRecipe) {
+                calculateProduction();
             }
         });
 
