@@ -515,14 +515,14 @@
             border-radius: 50%;
         }
 
-        /* Advertisement Panels */
-        .ad-container {
+        /* Promo Panels */
+        .promo-container {
             display: flex;
             gap: 15px;
             margin: 20px 0;
         }
 
-        .ad-panel {
+        .promo-panel {
             flex: 1;
             background-color: #1e1f2a;
             border-radius: 8px;
@@ -538,7 +538,7 @@
             transition: all 0.3s ease;
         }
 
-        .ad-panel:hover {
+        .promo-panel:hover {
             border-color: #70d6ff;
             box-shadow: 0 4px 12px rgba(112, 214, 255, 0.1);
         }
@@ -616,11 +616,20 @@
             </select>
         </section>
 
-        <!-- Advertisement Panels -->
-        <div class="ad-container">
-            <div class="ad-panel">Coming soon...</div>
-            <div class="ad-panel">Coming soon...</div>
-            <div class="ad-panel">Coming soon...</div>
+        <!-- Promo Panels -->
+        <div class="promo-container">
+            <div class="promo-panel">
+                <img src="pending" alt="Promo image 1">
+                Coming soon...
+            </div>
+            <div class="promo-panel">
+                <img src="pending" alt="Promo image 2">
+                Coming soon...
+            </div>
+            <div class="promo-panel">
+                <img src="pending" alt="Promo image 3">
+                Coming soon...
+            </div>
         </div>
 
         <section class="recipe-display" id="recipe-display">
@@ -736,9 +745,12 @@
         </section>
     </div>
 
-    <!-- Bottom Advertisement Panel -->
-    <div class="ad-container" style="margin-top: 40px;">
-        <div class="ad-panel" style="width: 100%;">Coming soon...</div>
+    <!-- Bottom Promo Panel -->
+    <div class="promo-container" style="margin-top: 40px;">
+        <div class="promo-panel" style="width: 100%;">
+            <img src="pending" alt="Bottom promo image">
+            Coming soon...
+        </div>
     </div>
 
     <script>
@@ -936,7 +948,7 @@
                 ],
                 usesTrays: true,
                 baggiesPerTray: 3,
-                finalForms: ["baggie", "container"]
+                finalForms: ["baggie", "brick"]
             },
 
         };
@@ -1173,7 +1185,7 @@
 
             } else {
                 // For traditional tray-based recipes
-                
+
                 // Always add tray option for tray-based recipes
                 const trayOption = document.createElement('option');
                 trayOption.value = 'tray';
@@ -1239,7 +1251,7 @@
 
             const quantity = parseInt(quantityInput.value) || 1;
             const type = quantityType.value;
-            
+
             // Set the current container type to match the selected quantity type
             currentContainerType = type;
             console.log("Recipe:", currentRecipe.key, "Container Type:", currentContainerType);
@@ -1390,19 +1402,19 @@
             // If the item has a yield value, adjust the needed quantity
             // This is the key change for tartrate salt which yields 4 per craft
             const yieldPerCraft = craftedItem.yields || 1;
-            
+
             // Calculate how many crafting operations we need to do
             // For example, if we need 3 tartrate salt, but each craft yields 4,
             // we only need to craft it once (Math.ceil(3/4) = 1)
             const craftingOperations = Math.ceil(neededQuantity / yieldPerCraft);
-            
+
             let cost = 0;
             craftedItem.ingredients.forEach(ingredient => {
                 if (ingredient.reusable && hasReusableItems) {
                     return; // Skip cost if user has reusable items
                 }
                 const ingredientCost = ingredientPrices[ingredient.name] || 0;
-                
+
                 // We multiple by the number of crafting operations, not the needed quantity
                 cost += ingredientCost * ingredient.quantity * craftingOperations;
             });
@@ -1473,18 +1485,18 @@
                 "Container Type:", containerType, 
                 "Container Count:", containerCount, 
                 "Selling Prices Data:", JSON.stringify(sellingPrices[currentRecipe.key]));
-                
+
             // For trays, we need special handling since they're not sold directly
             if (containerType === 'tray') {
                 // Get value from form quantity input, not the auto-calculated containerCount (which can be 0)
                 const inputQuantity = parseInt(quantityInput.value) || 1;
-                
+
                 // For clear meth, 1 tray = 3 baggies (baggiesPerTray)
                 const baggiesPerTray = currentRecipe.baggiesPerTray || 1;
-                
+
                 // Calculate how many baggies this would be
                 const totalBaggies = inputQuantity * baggiesPerTray;
-                
+
                 // Use the baggie price to calculate tray value
                 if (sellingPrices[currentRecipe.key] && sellingPrices[currentRecipe.key]['baggie']) {
                     const baggiePrice = sellingPrices[currentRecipe.key]['baggie'];
@@ -1494,7 +1506,7 @@
                     return totalPrice;
                 }
             }
-                
+
             // If no selling price is defined for the current container type, 
             // try to fallback to a valid price if available
             if (!sellingPrices[currentRecipe.key] || !sellingPrices[currentRecipe.key][containerType]) {
@@ -1528,7 +1540,7 @@
 
             requiredTraysElement.textContent = requiredTrays;
             totalBaggiesElement.textContent = totalBaggies;
-            
+
             // When selected container type is "tray", use the inputQuantity, not the containerCount (which is always 0)
             if (currentContainerType === 'tray') {
                 const inputQuantity = parseInt(quantityInput.value) || 1;
@@ -1536,7 +1548,7 @@
             } else {
                 finalProductElement.textContent = `${containerCount} ${containerLabel}`;
             }
-            
+
             // Show dryers count except for LSD
             requiredDryersElement.textContent = currentRecipe.usesTrays === false ? 'None' : Math.ceil(requiredTrays / 4);
         }
@@ -1564,7 +1576,7 @@
                         // Account for the yield of crafted items
                         const yieldPerCraft = craftedItem.yields || 1;
                         const craftingOperations = Math.ceil(neededQuantity / yieldPerCraft);
-                        
+
                         craftedItem.ingredients.forEach(subIngredient => {
                             const subIngredientPrice = ingredientPrices[subIngredient.name] || 0;
                             // Calculate quantity based on crafting operations, not total needed
@@ -1578,7 +1590,7 @@
                             // Add indicator for reusable items
                             const reusableLabel = subIngredient.reusable ? ' (Reusable)' : '';
                             const costDisplay = subIngredient.reusable && hasReusableItems ? 'Already Have' : totalSubCost;
-                            
+
                             ingredientsCostHTML += `
                                 <div class="ingredient-cost-item" style="margin-left: 20px;">
                                     <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)}${reusableLabel} x${totalSubQuantity}</span>
@@ -1586,7 +1598,7 @@
                                 </div>
                             `;
                         });
-                        
+
                         // Add yield info for the crafted item, only once after all sub-ingredients
                         if (craftedItem.yields > 1) {
                             ingredientsCostHTML += `
@@ -1685,21 +1697,21 @@
             sellingPriceElement.textContent = formatPrice(sellingPrice);
             costSummaryElement.textContent = formatPrice(totalCost);
             profitElement.textContent = formatPrice(Math.abs(profit));
-            
+
             // Format and color-code profit margin
             let profitColor = '#4caf50'; // Green by default
-            
+
             if (profitMargin < 20) {
                 profitColor = '#FF5252'; // Red for low margins
             } else if (profitMargin < 40) {
                 profitColor = '#FFC107'; // Yellow for medium margins
             }
-            
+
             // If profit is negative, always use red
             if (profit < 0) {
                 profitColor = 'red';
             }
-            
+
             profitMarginElement.textContent = `${profitMargin}%`;
             profitElement.style.color = profitColor;
             profitMarginElement.style.color = profitColor;
@@ -1709,7 +1721,7 @@
         function formatPrice(number) {
             return Number(number).toLocaleString();
         }
-        
+
         // Format ingredient name for display (convert snake_case to Title Case)
         function formatIngredientName(name) {
             return name.split('_')
@@ -1940,7 +1952,7 @@
             // Update the current container type to match the selected quantity type
             currentContainerType = this.value;
             console.log("Container type changed to:", currentContainerType);
-            
+
             // Recalculate if a recipe is selected
             if (currentRecipe) {
                 calculateProduction();
