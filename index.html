@@ -821,8 +821,7 @@
         const sellingPrices = {
             "clear_meth": {
                 "baggie": 1250,
-                "container": 13310,
-
+                "container": 13310
             },
             "lsd": {
                 "packet": 1950,
@@ -831,8 +830,7 @@
             },
             "heroin": {
                 "syringe": 2530,
-                "box": 25840,
-
+                "box": 25840
             },
             "anadrol": {
                 "syringe": 1730,
@@ -840,12 +838,11 @@
             },
             "pcp": {
                 "crystal": 1300,
-                "brick": 20040,
+                "brick": 20040
             },
             "cocaine": {
                 "baggie": 3060,
-                "brick": 46440,
-
+                "brick": 46440
             },
             "crack_cocaine": {
                 "crystal": 3920,
@@ -884,10 +881,10 @@
                     { name: "match_box", quantity: 2 },
                     { name: "hydrogen_chloride", quantity: 1},
                     { name: "acetone", quantity: 1}
-
                 ],
+                usesTrays: true,
                 baggiesPerTray: 3,
-                finalForms: ["baggie", "container",]
+                finalForms: ["baggie", "container"]
             },
             "lsd": {
                 name: "LSD",
@@ -895,8 +892,8 @@
                     { name: "lysergic_acid", quantity: 2 },
                     { name: "tartrate_salt", quantity: 1, crafted: true },
                     { name: "acetone", quantity: 1 },
-                    { name: "nitrogen_trioxide", quantity: 1 },
-                    { name: "saran_wrap", quantity: 1 }
+                    { name: "nitrogen_trioxide", quantity: 1 }
+                    // Removed saran_wrap from ingredients as it's handled in packaging
                 ],
                 usesTrays: false,
                 packetsPerBatch: 1, // Changed to 1 unit per batch
@@ -919,7 +916,7 @@
 
                 ],
                 baggiesPerTray: 6,
-                finalForms: ["baggie", "container",]
+                finalForms: ["baggie", "container"]
             },
             "cocaine": {
                 name: "Cocaine",
@@ -939,7 +936,7 @@
                 ],
                 usesTrays: true,
                 baggiesPerTray: 3,
-                finalForms: ["baggie", "container",]
+                finalForms: ["baggie", "container"]
             },
 
         };
@@ -1023,7 +1020,7 @@
             'pack': 0,
             'bag': 0,
             'container': 10,
-            'packet': 1,
+            'packet': 1
         };
 
         // Populate the dropdown with recipe options
@@ -1176,8 +1173,8 @@
 
             } else {
                 // For traditional tray-based recipes
-
-                // Add tray option
+                
+                // Always add tray option for tray-based recipes
                 const trayOption = document.createElement('option');
                 trayOption.value = 'tray';
                 trayOption.textContent = 'Trays';
@@ -1242,6 +1239,10 @@
 
             const quantity = parseInt(quantityInput.value) || 1;
             const type = quantityType.value;
+            
+            // Set the current container type to match the selected quantity type
+            currentContainerType = type;
+            console.log("Recipe:", currentRecipe.key, "Container Type:", currentContainerType);
 
 
             // Handle packet-based recipes differently from tray-based recipes
@@ -1351,6 +1352,8 @@
             const totalCost = ingredientsCost + packagingCost;
 
             // Calculate selling price
+            // Make sure we're using the current container type selected in the dropdown
+            console.log("Before selling price calculation - Container Type:", currentContainerType, "Container Count:", containerCount);
             const sellingPrice = calculateSellingPrice(containerCount, currentContainerType);
 
             // Calculate profit and profit margin
@@ -1465,18 +1468,51 @@
 
         // Calculate selling price
         function calculateSellingPrice(containerCount, containerType) {
+            console.log("Selling price calculation:", 
+                "Recipe:", currentRecipe.key, 
+                "Container Type:", containerType, 
+                "Container Count:", containerCount, 
+                "Selling Prices Data:", JSON.stringify(sellingPrices[currentRecipe.key]));
+                
+            // For trays, we need special handling since they're not sold directly
+            if (containerType === 'tray') {
+                // Get value from form quantity input, not the auto-calculated containerCount (which can be 0)
+                const inputQuantity = parseInt(quantityInput.value) || 1;
+                
+                // For clear meth, 1 tray = 3 baggies (baggiesPerTray)
+                const baggiesPerTray = currentRecipe.baggiesPerTray || 1;
+                
+                // Calculate how many baggies this would be
+                const totalBaggies = inputQuantity * baggiesPerTray;
+                
+                // Use the baggie price to calculate tray value
+                if (sellingPrices[currentRecipe.key] && sellingPrices[currentRecipe.key]['baggie']) {
+                    const baggiePrice = sellingPrices[currentRecipe.key]['baggie'];
+                    const totalPrice = baggiePrice * totalBaggies;
+                    console.log("Calculating tray value based on", inputQuantity, "trays at", baggiesPerTray, 
+                        "baggies each at", baggiePrice, "per baggie =", totalPrice);
+                    return totalPrice;
+                }
+            }
+                
+            // If no selling price is defined for the current container type, 
+            // try to fallback to a valid price if available
             if (!sellingPrices[currentRecipe.key] || !sellingPrices[currentRecipe.key][containerType]) {
+                console.log("No selling price found for", containerType);
                 return 0; // No selling price defined
             }
 
             const unitPrice = sellingPrices[currentRecipe.key][containerType];
+            console.log("Unit price found:", unitPrice);
 
             // Special handling for LSD batches
             if (currentRecipe.key === 'lsd' && containerType === 'packet') {
                 return unitPrice * containerCount; // Each packet sells for the packet price
             }
 
-            return unitPrice * containerCount;
+            const totalPrice = unitPrice * containerCount;
+            console.log("Total selling price:", totalPrice);
+            return totalPrice;
         }
 
         // Update production summary in UI
@@ -1492,7 +1528,15 @@
 
             requiredTraysElement.textContent = requiredTrays;
             totalBaggiesElement.textContent = totalBaggies;
-            finalProductElement.textContent = `${containerCount} ${containerLabel}`;
+            
+            // When selected container type is "tray", use the inputQuantity, not the containerCount (which is always 0)
+            if (currentContainerType === 'tray') {
+                const inputQuantity = parseInt(quantityInput.value) || 1;
+                finalProductElement.textContent = `${inputQuantity} ${containerLabel}`;
+            } else {
+                finalProductElement.textContent = `${containerCount} ${containerLabel}`;
+            }
+            
             // Show dryers count except for LSD
             requiredDryersElement.textContent = currentRecipe.usesTrays === false ? 'None' : Math.ceil(requiredTrays / 4);
         }
@@ -1535,16 +1579,23 @@
                             const reusableLabel = subIngredient.reusable ? ' (Reusable)' : '';
                             const costDisplay = subIngredient.reusable && hasReusableItems ? 'Already Have' : totalSubCost;
                             
-                            // Add yield info if applicable
-                            const yieldInfo = craftedItem.yields > 1 ? ` (Yields ${craftedItem.yields} per craft)` : '';
-
                             ingredientsCostHTML += `
                                 <div class="ingredient-cost-item" style="margin-left: 20px;">
-                                    <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)}${reusableLabel} x${totalSubQuantity}${yieldInfo}</span>
+                                    <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)}${reusableLabel} x${totalSubQuantity}</span>
                                     <span class="ingredient-cost-value">${costDisplay}</span>
                                 </div>
                             `;
                         });
+                        
+                        // Add yield info for the crafted item, only once after all sub-ingredients
+                        if (craftedItem.yields > 1) {
+                            ingredientsCostHTML += `
+                                <div class="ingredient-cost-item" style="margin-left: 20px; color: #4CAF50;">
+                                    <span class="ingredient-cost-name">└ Yields ${craftedItem.yields} per craft</span>
+                                    <span class="ingredient-cost-value"></span>
+                                </div>
+                            `;
+                        }
                     }
                 } else {
                     // For regular ingredients
@@ -1579,9 +1630,11 @@
                 const packetMaterialCost = packetUnitCost * packetRequirement.quantity * totalBaggies;
                 totalPackagingCost += packetMaterialCost;
 
+                // Use the actual material name from the requirements
+                const materialName = formatIngredientName(packetRequirement.material);
                 packagingCostHTML += `
                     <div class="ingredient-cost-item">
-                        <span class="ingredient-cost-name">Paper (for ${totalBaggies} packets)</span>
+                        <span class="ingredient-cost-name">${materialName} (for ${totalBaggies} packets)</span>
                         <span class="ingredient-cost-value">${packetMaterialCost}</span>
                     </div>
                 `;
@@ -1592,9 +1645,11 @@
                 const baggieMaterialCost = baggieUnitCost * baggieRequirement.quantity * totalBaggies;
                 totalPackagingCost += baggieMaterialCost;
 
+                // Use the actual material name from the requirements
+                const materialName = formatIngredientName(baggieRequirement.material);
                 packagingCostHTML += `
                     <div class="ingredient-cost-item">
-                        <span class="ingredient-cost-name">Saran Wrap (for ${totalBaggies} baggies)</span>
+                        <span class="ingredient-cost-name">${materialName} (for ${totalBaggies} baggies)</span>
                         <span class="ingredient-cost-value">${baggieMaterialCost}</span>
                     </div>
                 `;
@@ -1626,20 +1681,35 @@
 
         // Update profit analysis in UI
         function updateProfitAnalysis(totalCost, sellingPrice, profit, profitMargin) {
-            sellingPriceElement.textContent = sellingPrice;
-            costSummaryElement.textContent = totalCost;
-            profitElement.textContent = profit;
+            // Format numbers for display
+            sellingPriceElement.textContent = formatPrice(sellingPrice);
+            costSummaryElement.textContent = formatPrice(totalCost);
+            profitElement.textContent = formatPrice(Math.abs(profit));
+            
+            // Format and color-code profit margin
+            let profitColor = '#4caf50'; // Green by default
+            
+            if (profitMargin < 20) {
+                profitColor = '#FF5252'; // Red for low margins
+            } else if (profitMargin < 40) {
+                profitColor = '#FFC107'; // Yellow for medium margins
+            }
+            
+            // If profit is negative, always use red
+            if (profit < 0) {
+                profitColor = 'red';
+            }
+            
             profitMarginElement.textContent = `${profitMargin}%`;
-
-            // Change color based on profit (red if negative)
-            const profitColor = profit >= 0 ? '#4caf50' : 'red';
             profitElement.style.color = profitColor;
-            profitElement.textContent = Math.abs(profit);
-
-            // Also change color of profit margin
             profitMarginElement.style.color = profitColor;
         }
 
+        // Format numbers as prices with commas
+        function formatPrice(number) {
+            return Number(number).toLocaleString();
+        }
+        
         // Format ingredient name for display (convert snake_case to Title Case)
         function formatIngredientName(name) {
             return name.split('_')
@@ -1869,6 +1939,8 @@
         quantityType.addEventListener('change', function() {
             // Update the current container type to match the selected quantity type
             currentContainerType = this.value;
+            console.log("Container type changed to:", currentContainerType);
+            
             // Recalculate if a recipe is selected
             if (currentRecipe) {
                 calculateProduction();
