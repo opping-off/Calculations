@@ -8,3 +8,6 @@
 
 
 (btw congrats on finding ts, I really doubt a lot of people will even bother tracking this repository down tbh)
+
+
+dm me the word 'goober' if you found this
