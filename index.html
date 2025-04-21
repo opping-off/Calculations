@@ -78,6 +78,28 @@
             display: inline-block;
             padding-bottom: 5px;
         }
+        .promo-panel {
+
+            margin-bottom: 15px; /* space between panels */
+        }
+
+        .promo-credit {
+            font-size: 0.9em;
+            color: #888;
+            text-align: center;
+            margin-top: 10px; /* space between image and text */
+        }
+
+        .promo-credit a {
+            color: #4a90e2;
+            text-decoration: none;
+        }
+
+        .promo-credit a:hover {
+            text-decoration: underline;
+        }
+
+
 
         .disclaimer {
             font-size: 0.8em;
@@ -609,10 +631,30 @@
 
         <!-- Advertisement Panels -->
         <div class="ad-container">
-            <div class="promo-panel">Want your ingame shop advertised?</div>
-            <div class="promo-panel">First 3 shops get advertisements for free</div>
-            <div class="promo-panel">Contact @aur.bee on discord for info!</div>
+            <div class="promo-panel">
+                <img src="images/promo1.png" alt="Promo 1" style="width:100%; height:auto;">
+                <div class="promo-credit">
+                    This advertisement is from: <a href="https://discord.gg/your-invite" target="_blank">Here</a>
+                </div>
+            </div>
+        
+            <div class="promo-panel">
+                <img src="images/promo2.png" alt="Promo 2" style="width:100%; height:auto;">
+                <div class="promo-credit">
+                    This advertisement is from: <a href="https://discord.gg/another-link" target="_blank">Here</a>
+                </div>
+            </div>
+        
+            <div class="promo-panel">
+                <img src="images/promo3.png" alt="Promo 3" style="width:100%; height:auto;">
+                <div class="promo-credit">
+                    This advertisement is from: <a href="https://discord.gg/somewhere" target="_blank">Here</a>
+                </div>
+            </div>
         </div>
+        
+        
+        
 
         <section class="recipe-display" id="recipe-display">
             <div class="recipe-grid">
@@ -662,7 +704,7 @@
                         <h3>Crafting Flow</h3>
                         <div class="production-info" id="production-info">
                             <p class="tray-info">All recipes start with <strong>Trays</strong> as the base production unit.</p>
-                            <p class="baggie-info">This recipe yields <span id="baggies-per-tray">1</span> unit per tray/batch.</p>
+                            <p class="baggie-info">This recipe yields <span id="baggies-per-tray">1</span> <span id="container-unit-name">baggie</span> per tray/batch.</p>
                         </div>
 
                         <div class="quantity-selector">
@@ -782,6 +824,8 @@
             "empty_barrel": 440, // costs 11 scrap
             "cocaine_hydrochloride": 0,
             "coca_leaves": 0,
+            "concentrated_phenethyl_bromide": 1185,
+            "blue_meth_baggie": 0,
 
 
 
@@ -883,8 +927,10 @@
                     { name: "lysergic_acid", quantity: 2 },
                     { name: "tartrate_salt", quantity: 1, crafted: true },
                     { name: "acetone", quantity: 1 },
-                    { name: "nitrogen_trioxide", quantity: 1 }
-                    // Removed saran_wrap from ingredients as it's handled in packaging
+                    { name: "nitrogen_trioxide", quantity: 1 },
+                    { name: "paper", quantity: 1 },
+                    { name: "saran_wrap", quantity: 1 },
+
                 ],
                 usesTrays: false,
                 packetsPerBatch: 1, // Changed to 1 unit per batch
@@ -929,6 +975,22 @@
                 baggiesPerTray: 3,
                 finalForms: ["baggie", "brick"]
             },
+            "fentanyl": {
+                name: "Fentanyl",
+                ingredients: [
+                    { name: "concentrated_phenethyl_bromide", quantity: 2 },
+                    { name: "blue_meth_baggie", quantity: 4 },
+
+
+
+
+
+
+                ],
+                usesTrays: true,
+                baggiesPerTray: 4,
+                finalForms: ["crystal", "brick"]
+            },
 
         };
 
@@ -938,6 +1000,7 @@
         const recipeTitle = document.getElementById('recipe-title');
         const ingredientsList = document.getElementById('ingredients-list');
         const baggiesPerTrayElement = document.getElementById('baggies-per-tray');
+        let containerUnitNameElement = document.getElementById('container-unit-name');
         const containerButtonsContainer = document.getElementById('container-buttons');
 
         // Quantity selector elements
@@ -1000,7 +1063,8 @@
             { id: 'bag', label: 'Bag' },
             { id: 'container', label: 'Container' },
             { id: 'syringe', label: 'Syringe' },
-            { id: 'packet', label: 'Packet' }
+            { id: 'packet', label: 'Packet' },
+            { id: 'crystal', label: 'Crystal' }
         ];
 
         // Define conversion rates (how many baggies in each container type)
@@ -1011,7 +1075,8 @@
             'pack': 0,
             'bag': 0,
             'container': 10,
-            'packet': 1
+            'packet': 1,
+            'crystal': 1
         };
 
         // Populate the dropdown with recipe options
@@ -1045,8 +1110,17 @@
             // Set default container type based on recipe
             if (recipeKey === 'lsd') {
                 currentContainerType = 'packet';
-            } else {
+            } 
+            else if (recipeKey === 'fentanyl') {
+                currentContainerType = 'crystal';
+            }
+            else {
                 currentContainerType = 'baggie';
+            }
+
+            // Update the container unit name in the production info
+            if (containerUnitNameElement) {
+                containerUnitNameElement.textContent = currentContainerType;
             }
 
             if (recipeDisplay) {
@@ -1088,6 +1162,25 @@
                         baggiesPerTrayElement.textContent = recipe.baggiesPerTray;
                     }
                 }
+            }
+
+            // Update baggie-info text for fentanyl recipe to use crystal instead of baggie/baggies
+            const baggieInfoElement = document.querySelector('.baggie-info');
+            if (baggieInfoElement && recipeKey === 'fentanyl') {
+                baggieInfoElement.innerHTML = `This recipe yields <span id="baggies-per-tray">${recipe.baggiesPerTray}</span> <span id="container-unit-name">crystal</span> per tray.
+                <p class="warning-note" style="color: #e53935; margin-top: 10px; font-weight: bold;">Warning: Profits do not include the cost to make blue meth, use blue meth recipe after finding out the desired baggie amount</p>`;
+                // Re-assign the element since we replaced it
+                containerUnitNameElement = document.getElementById('container-unit-name');
+            } else if (baggieInfoElement && recipeKey === 'lsd') {
+                // For LSD recipe which uses batch instead of trays
+                baggieInfoElement.innerHTML = `This recipe yields <span id="baggies-per-tray">1</span> <span id="container-unit-name">packet</span> per batch.`;
+                // Re-assign the element since we replaced it
+                containerUnitNameElement = document.getElementById('container-unit-name');
+            } else if (baggieInfoElement) {
+                // For other recipes, make sure we use the appropriate container unit
+                baggieInfoElement.innerHTML = `This recipe yields <span id="baggies-per-tray">${recipe.baggiesPerTray}</span> <span id="container-unit-name">${currentContainerType}</span> per tray/batch.`;
+                // Re-assign the element since we replaced it
+                containerUnitNameElement = document.getElementById('container-unit-name');
             }
 
             // Clear existing ingredients
@@ -1164,18 +1257,20 @@
 
             } else {
                 // For traditional tray-based recipes
-                
+
                 // Always add tray option for tray-based recipes
                 const trayOption = document.createElement('option');
                 trayOption.value = 'tray';
                 trayOption.textContent = 'Trays';
                 quantityType.appendChild(trayOption);
 
-                // Add baggie option
-                const baggieOption = document.createElement('option');
-                baggieOption.value = 'baggie';
-                baggieOption.textContent = 'Baggies';
-                quantityType.appendChild(baggieOption);
+                // Add baggie option except for fentanyl recipe
+                if (currentRecipe.key !== 'fentanyl') {
+                    const baggieOption = document.createElement('option');
+                    baggieOption.value = 'baggie';
+                    baggieOption.textContent = 'Baggies';
+                    quantityType.appendChild(baggieOption);
+                }
             }
 
             // Add other container options that are in the recipe's finalForms
@@ -1186,7 +1281,8 @@
                 {value: 'brick', label: 'Bricks'},
                 {value: 'pack', label: 'Packs'},
                 {value: 'bag', label: 'Bags'},
-                {value: 'container', label: 'Containers'}
+                {value: 'container', label: 'Containers'},
+                {value: 'crystal', label: 'Crystals'}
             ];
 
             containerTypes.forEach(container => {
@@ -1201,6 +1297,8 @@
             // Select the appropriate default based on recipe type
             if (currentRecipe.key === 'lsd') {
                 quantityType.value = 'packet';
+            } else if (currentRecipe.key === 'fentanyl') {
+                quantityType.value = 'crystal';
             } else {
                 quantityType.value = 'baggie';
             }
@@ -1210,7 +1308,16 @@
         function resetCalculationDisplay() {
             requiredTraysElement.textContent = '0';
             totalBaggiesElement.textContent = '0';
-            finalProductElement.textContent = '0 Baggies';
+
+            // Show correct product name based on recipe type
+            if (currentRecipe && currentRecipe.key === 'fentanyl') {
+                finalProductElement.textContent = '0 Crystals';
+            } else if (currentRecipe && currentRecipe.key === 'lsd') {
+                finalProductElement.textContent = '0 Packets';
+            } else {
+                finalProductElement.textContent = '0 Baggies';
+            }
+
             requiredDryersElement.textContent = '0'; //Added for dryers
             ingredientsCostElement.innerHTML = '<p class="empty-state">Select a recipe and calculate quantities</p>';
             packagingCostsElement.innerHTML = '';
@@ -1230,12 +1337,14 @@
 
             const quantity = parseInt(quantityInput.value) || 1;
             const type = quantityType.value;
-            
+
             // Set the current container type to match the selected quantity type
             currentContainerType = type;
             console.log("Recipe:", currentRecipe.key, "Container Type:", currentContainerType);
 
-
+            // Don't update the container unit name in the production info
+            // The crafting flow section should remain static showing the base recipe info
+            
             // Handle packet-based recipes differently from tray-based recipes
             let totalBaggies = 0;
             let requiredTrays = 0;
@@ -1265,9 +1374,12 @@
                 // Traditional tray-based recipe calculation
                 switch(type) {
                     case 'tray':
-                        totalBaggies = quantity *currentRecipe.baggiesPerTray;
+                        totalBaggies = quantity * currentRecipe.baggiesPerTray;
                         break;
                     case 'baggie':
+                        totalBaggies = quantity;
+                        break;
+                    case 'crystal':
                         totalBaggies = quantity;
                         break;
                     case 'box':
@@ -1310,6 +1422,10 @@
                 case 'syringe':
                     containerCount = totalBaggies;
                     containerLabel = 'Syringes';
+                    break;
+                case 'crystal':
+                    containerCount = totalBaggies;
+                    containerLabel = 'Crystals';
                     break;
                 case 'box':
                     containerCount = Math.floor(totalBaggies / 10);
@@ -1381,19 +1497,19 @@
             // If the item has a yield value, adjust the needed quantity
             // This is the key change for tartrate salt which yields 4 per craft
             const yieldPerCraft = craftedItem.yields || 1;
-            
+
             // Calculate how many crafting operations we need to do
             // For example, if we need 3 tartrate salt, but each craft yields 4,
             // we only need to craft it once (Math.ceil(3/4) = 1)
             const craftingOperations = Math.ceil(neededQuantity / yieldPerCraft);
-            
+
             let cost = 0;
             craftedItem.ingredients.forEach(ingredient => {
                 if (ingredient.reusable && hasReusableItems) {
                     return; // Skip cost if user has reusable items
                 }
                 const ingredientCost = ingredientPrices[ingredient.name] || 0;
-                
+
                 // We multiple by the number of crafting operations, not the needed quantity
                 cost += ingredientCost * ingredient.quantity * craftingOperations;
             });
@@ -1464,28 +1580,36 @@
                 "Container Type:", containerType, 
                 "Container Count:", containerCount, 
                 "Selling Prices Data:", JSON.stringify(sellingPrices[currentRecipe.key]));
-                
+
             // For trays, we need special handling since they're not sold directly
             if (containerType === 'tray') {
                 // Get value from form quantity input, not the auto-calculated containerCount (which can be 0)
                 const inputQuantity = parseInt(quantityInput.value) || 1;
-                
-                // For clear meth, 1 tray = 3 baggies (baggiesPerTray)
+
+                // Get the number of units per tray from the recipe
                 const baggiesPerTray = currentRecipe.baggiesPerTray || 1;
-                
-                // Calculate how many baggies this would be
-                const totalBaggies = inputQuantity * baggiesPerTray;
-                
-                // Use the baggie price to calculate tray value
-                if (sellingPrices[currentRecipe.key] && sellingPrices[currentRecipe.key]['baggie']) {
+
+                // Calculate how many units this would be
+                const totalUnits = inputQuantity * baggiesPerTray;
+
+                // For fentanyl recipe, use crystal price
+                if (currentRecipe.key === 'fentanyl' && sellingPrices[currentRecipe.key]['crystal']) {
+                    const crystalPrice = sellingPrices[currentRecipe.key]['crystal'];
+                    const totalPrice = crystalPrice * totalUnits;
+                    console.log("Calculating tray value for fentanyl based on", inputQuantity, "trays at", baggiesPerTray, 
+                        "crystals each at", crystalPrice, "per crystal =", totalPrice);
+                    return totalPrice;
+                }
+                // For other recipes, use baggie price if available
+                else if (sellingPrices[currentRecipe.key] && sellingPrices[currentRecipe.key]['baggie']) {
                     const baggiePrice = sellingPrices[currentRecipe.key]['baggie'];
-                    const totalPrice = baggiePrice * totalBaggies;
+                    const totalPrice = baggiePrice * totalUnits;
                     console.log("Calculating tray value based on", inputQuantity, "trays at", baggiesPerTray, 
                         "baggies each at", baggiePrice, "per baggie =", totalPrice);
                     return totalPrice;
                 }
             }
-                
+
             // If no selling price is defined for the current container type, 
             // try to fallback to a valid price if available
             if (!sellingPrices[currentRecipe.key] || !sellingPrices[currentRecipe.key][containerType]) {
@@ -1512,6 +1636,9 @@
             if (currentRecipe.usesTrays === false) {
                 document.querySelector('.required-trays-label').textContent = 'Required Batches:';
                 document.querySelector('.total-baggies-label').textContent = 'Total Packets:';
+            } else if (currentRecipe.key === 'fentanyl') {
+                document.querySelector('.required-trays-label').textContent = 'Required Trays:';
+                document.querySelector('.total-baggies-label').textContent = 'Total Crystals:';
             } else {
                 document.querySelector('.required-trays-label').textContent = 'Required Trays:';
                 document.querySelector('.total-baggies-label').textContent = 'Total Baggies:';
@@ -1519,7 +1646,7 @@
 
             requiredTraysElement.textContent = requiredTrays;
             totalBaggiesElement.textContent = totalBaggies;
-            
+
             // When selected container type is "tray", use the inputQuantity, not the containerCount (which is always 0)
             if (currentContainerType === 'tray') {
                 const inputQuantity = parseInt(quantityInput.value) || 1;
@@ -1527,7 +1654,7 @@
             } else {
                 finalProductElement.textContent = `${containerCount} ${containerLabel}`;
             }
-            
+
             // Show dryers count except for LSD
             requiredDryersElement.textContent = currentRecipe.usesTrays === false ? 'None' : Math.ceil(requiredTrays / 4);
         }
@@ -1555,7 +1682,7 @@
                         // Account for the yield of crafted items
                         const yieldPerCraft = craftedItem.yields || 1;
                         const craftingOperations = Math.ceil(neededQuantity / yieldPerCraft);
-                        
+
                         craftedItem.ingredients.forEach(subIngredient => {
                             const subIngredientPrice = ingredientPrices[subIngredient.name] || 0;
                             // Calculate quantity based on crafting operations, not total needed
@@ -1569,7 +1696,7 @@
                             // Add indicator for reusable items
                             const reusableLabel = subIngredient.reusable ? ' (Reusable)' : '';
                             const costDisplay = subIngredient.reusable && hasReusableItems ? 'Already Have' : totalSubCost;
-                            
+
                             ingredientsCostHTML += `
                                 <div class="ingredient-cost-item" style="margin-left: 20px;">
                                     <span class="ingredient-cost-name">└ ${formatIngredientName(subIngredient.name)}${reusableLabel} x${totalSubQuantity}</span>
@@ -1577,7 +1704,7 @@
                                 </div>
                             `;
                         });
-                        
+
                         // Add yield info for the crafted item, only once after all sub-ingredients
                         if (craftedItem.yields > 1) {
                             ingredientsCostHTML += `
@@ -1638,12 +1765,23 @@
 
                 // Use the actual material name from the requirements
                 const materialName = formatIngredientName(baggieRequirement.material);
-                packagingCostHTML += `
-                    <div class="ingredient-cost-item">
-                        <span class="ingredient-cost-name">${materialName} (for ${totalBaggies} baggies)</span>
-                        <span class="ingredient-cost-value">${baggieMaterialCost}</span>
-                    </div>
-                `;
+
+                // For fentanyl recipe, use "crystals" instead of "baggies"
+                if (currentRecipe.key === 'fentanyl') {
+                    packagingCostHTML += `
+                        <div class="ingredient-cost-item">
+                            <span class="ingredient-cost-name">${materialName} (for ${totalBaggies} crystals)</span>
+                            <span class="ingredient-cost-value">${baggieMaterialCost}</span>
+                        </div>
+                    `;
+                } else {
+                    packagingCostHTML += `
+                        <div class="ingredient-cost-item">
+                            <span class="ingredient-cost-name">${materialName} (for ${totalBaggies} baggies)</span>
+                            <span class="ingredient-cost-value">${baggieMaterialCost}</span>
+                        </div>
+                    `;
+                }
             }
 
             // Add container materials if needed
@@ -1676,21 +1814,21 @@
             sellingPriceElement.textContent = formatPrice(sellingPrice);
             costSummaryElement.textContent = formatPrice(totalCost);
             profitElement.textContent = formatPrice(Math.abs(profit));
-            
+
             // Format and color-code profit margin
             let profitColor = '#4caf50'; // Green by default
-            
+
             if (profitMargin < 20) {
                 profitColor = '#FF5252'; // Red for low margins
             } else if (profitMargin < 40) {
                 profitColor = '#FFC107'; // Yellow for medium margins
             }
-            
+
             // If profit is negative, always use red
             if (profit < 0) {
                 profitColor = 'red';
             }
-            
+
             profitMarginElement.textContent = `${profitMargin}%`;
             profitElement.style.color = profitColor;
             profitMarginElement.style.color = profitColor;
@@ -1700,7 +1838,7 @@
         function formatPrice(number) {
             return Number(number).toLocaleString();
         }
-        
+
         // Format ingredient name for display (convert snake_case to Title Case)
         function formatIngredientName(name) {
             return name.split('_')
@@ -1931,6 +2069,9 @@
             // Update the current container type to match the selected quantity type
             currentContainerType = this.value;
             console.log("Container type changed to:", currentContainerType);
+
+            // Don't update the container unit name in production info
+            // The crafting flow message should remain static
             
             // Recalculate if a recipe is selected
             if (currentRecipe) {
